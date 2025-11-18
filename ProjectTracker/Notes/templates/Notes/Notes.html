@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mes Notes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+
+  <!-- ===== Top Nav ===== -->
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/70 glass border-b border-slate-200/60 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <div class="h-9 w-9 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 grid place-items-center text-white font-bold">PT</div>
+        <span class="font-semibold">Personal Tracker</span>
+      </div>
+      <nav class="ml-6 hidden md:flex items-center gap-2 text-sm">
+        <a href="notes.html" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">Notes</a>
+        <a href="add_note.html" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">Ajouter une note</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== Main Layout ===== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Sidebar conservée -->
+    <aside class="lg:col-span-3 order-last lg:order-first space-y-4">
+      <!-- Statistiques rapides -->
+      <section class="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h2 class="font-semibold mb-3">Statistiques rapides</h2>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+            <div class="text-xs opacity-70">Aujourd’hui</div>
+            <div id="stat-today" class="text-xl font-bold">2h 10m</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+            <div class="text-xs opacity-70">Semaine</div>
+            <div id="stat-week" class="text-xl font-bold">11h 35m</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+            <div class="text-xs opacity-70">Streak</div>
+            <div id="stat-streak" class="text-xl font-bold">5🔥</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tâches imminentes -->
+      <section class="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <h3 class="font-semibold mb-3">Tâches imminentes</h3>
+        <ul class="space-y-2 text-sm">
+          <li class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-between">
+            <span>Lire article X <span class="opacity-70">(2025-10-29)</span></span>
+            <input type="checkbox" class="rounded">
+          </li>
+          <li class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-between">
+            <span>Maquette UI <span class="opacity-70">(2025-10-30)</span></span>
+            <input type="checkbox" class="rounded">
+          </li>
+        </ul>
+        <!-- Bouton avec fond bleu -->
+        <button class="mt-3 w-full px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white">+ Nouvelle tâche</button>
+      </section>
+
+      <!-- Badge -->
+      <section class="p-4 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-sm">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"></path><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"></path><path d="M18 9h1.5a1 1 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"></path><path d="M6 9H4.5a1 1 0 0 1 0-5H6"></path></svg>
+          <div>
+            <div class="font-semibold">Badge débloqué</div>
+            <div class="text-sm opacity-90">"Focus Ninja" — 7 jours d’affilée</div>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Notes -->
+    <section class="lg:col-span-9 space-y-6">
+      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {% for Note in Notes %}
+        <!-- Suppression du scroll barre -->
+        <div class="p-4 rounded-xl bg-slate-800 border h-60 border-slate-700 shadow-sm">
+          <h3 class="font-semibold mb-2 text-indigo-400">{{ Note.title }}</h3>
+          <p class="text-sm opacity-90 whitespace-pre-wrap break-words" style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
+            {{ Note.content|truncatechars:200 }}
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>
