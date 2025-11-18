@@ -60,7 +60,7 @@
           </li>
         </ul>
         <!-- Bouton avec fond bleu -->
-        <button class="mt-3 w-full px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white">+ Nouvelle tâche</button>
+        <a href="{% url 'Notes:Add_Note' %}"><button class="mt-3 w-full px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white">+ Nouvelle note</button></a>
       </section>
 
       <!-- Badge -->
@@ -81,7 +81,10 @@
         {% for Note in Notes %}
         <!-- Suppression du scroll barre -->
         <div class="p-4 rounded-xl bg-slate-800 border h-60 border-slate-700 shadow-sm">
-          <h3 class="font-semibold mb-2 text-indigo-400">{{ Note.title }}</h3>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold text-indigo-400">{{ Note.title }}</h3>
+              <span class="text-xs opacity-70">{{ Note.update_at }}</span>
+            </div>
           <p class="text-sm opacity-90 whitespace-pre-wrap break-words" style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
             {{ Note.content|truncatechars:200 }}
           </p>
