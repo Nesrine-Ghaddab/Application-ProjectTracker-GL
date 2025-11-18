@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- En-tête du projet -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">{{ project.title }}</h1>
+                <p class="text-gray-600 mb-4">{{ project.description }}</p>
+            </div>
+            <div class="flex space-x-2">
+                <a href="{% url 'Gestion_Projects:project_update' project.pk %}" 
+                   class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Modifier
+                </a>
+                <a href="{% url 'Gestion_Projects:project_delete' project.pk %}" 
+                   class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    Supprimer
+                </a>
+            </div>
+        </div>
+
+        <!-- Informations du projet -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+            <div class="bg-gray-50 p-4 rounded">
+                <h3 class="font-semibold text-gray-700">Statut</h3>
+                <p class="mt-1">{{ project.get_status_display }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <h3 class="font-semibold text-gray-700">Date limite</h3>
+                <p class="mt-1 {% if project.is_overdue %}text-red-600{% endif %}">
+                    {{ project.deadline }}
+                    {% if project.is_overdue %}(En retard){% endif %}
+                </p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <h3 class="font-semibold text-gray-700">Progression</h3>
+                <div class="mt-1">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ project.progress }}%"></div>
+                    </div>
+                    <p class="mt-1">{{ project.progress }}%</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <h3 class="font-semibold text-gray-700">Temps total</h3>
+                <p class="mt-1">{{ project.total_time }} heures</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques des tâches -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4">Aperçu des tâches</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-blue-50 p-4 rounded">
+                <h3 class="font-semibold text-blue-700">Total</h3>
+                <p class="text-2xl mt-1">{{ total_tasks }}</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded">
+                <h3 class="font-semibold text-green-700">Terminées</h3>
+                <p class="text-2xl mt-1">{{ completed_tasks }}</p>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded">
+                <h3 class="font-semibold text-yellow-700">En attente</h3>
+                <p class="text-2xl mt-1">{{ pending_tasks }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des tâches -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Tâches</h2>
+            <a href="#" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Nouvelle tâche
+            </a>
+        </div>
+
+        {% if tasks %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date limite</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priorité</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for task in tasks %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ task.title }}</div>
+                            {% if task.description %}
+                            <div class="text-sm text-gray-500">{{ task.description|truncatewords:10 }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900">{{ task.deadline }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {% if task.priority == 'high' %}bg-red-100 text-red-800
+                                {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {% if task.is_completed %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ task.is_completed|yesno:"Terminée,En cours" }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-4">Aucune tâche pour ce projet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
