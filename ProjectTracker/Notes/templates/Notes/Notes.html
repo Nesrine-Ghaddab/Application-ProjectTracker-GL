@@ -80,15 +80,17 @@
       <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
         {% for Note in Notes %}
         <!-- Suppression du scroll barre -->
-        <div class="p-4 rounded-xl bg-slate-800 border h-60 border-slate-700 shadow-sm">
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="font-semibold text-indigo-400">{{ Note.title }}</h3>
-              <span class="text-xs opacity-70">{{ Note.update_at }}</span>
-            </div>
-          <p class="text-sm opacity-90 whitespace-pre-wrap break-words" style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
-            {{ Note.content|truncatechars:200 }}
-          </p>
-        </div>
+        <a href="{% url 'Notes:Details_Note' note_id=Note.id %}">
+          <div class="p-4 rounded-xl bg-slate-800 border h-60 border-slate-700 shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold text-indigo-400">{{ Note.title }}</h3>
+                <span class="text-xs opacity-70">{{ Note.update_at }}</span>
+              </div>
+            <p class="text-sm opacity-90 whitespace-pre-wrap break-words" style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
+              {{ Note.content|truncatechars:200 }}
+            </p>
+          </div>
+        </a>
         {% endfor %}
       </div>
     </section>

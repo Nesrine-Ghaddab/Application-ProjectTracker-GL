@@ -17,3 +17,7 @@ def new_note(request):
 	else:
 		form = NoteForm()
 	return render(request, "Notes/Add_Note.html", {"form": form})
+
+def details_note(request, note_id):
+	note_content = Note.objects.get(pk = note_id)
+	return render(request, "Notes/Details_Note.html", {"note":note_content})
