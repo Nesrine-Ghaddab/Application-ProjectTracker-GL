@@ -21,3 +21,15 @@ def new_note(request):
 def details_note(request, note_id):
 	note_content = Note.objects.get(pk = note_id)
 	return render(request, "Notes/Details_Note.html", {"note":note_content})
+
+def edit_note(request, note_id):
+	note = Note.objects.get(pk = note_id)
+	if request.method == 'POST':
+		form = NoteForm(request.POST, instance=note)
+
+		if (form.is_valid()):
+			form.save()
+			return redirect('Notes:Details_Note', note_id=note_id)
+	else:
+		form = NoteForm(instance=note)
+	return render(request, "Notes/Edit_Note.html", {"note":form})
