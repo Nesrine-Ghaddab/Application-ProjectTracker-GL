@@ -40,7 +40,7 @@ def project_list(request):
         'search_query': search_query,
         'current_sort': sort_by,
     }
-    return render(request, 'projects/project_list.html', context)
+    return render(request, 'base_tailwind/project_list.html', context)
 
 @login_required
 def project_create(request):
@@ -56,7 +56,7 @@ def project_create(request):
     else:
         form = ProjectForm()
     
-    return render(request, 'projects/project_form.html', {
+    return render(request, 'base_tailwind/project_form.html', {
         'form': form,
         'title': 'Créer un projet'
     })
@@ -79,7 +79,7 @@ def project_detail(request, pk):
         'completed_tasks': completed_tasks,
         'pending_tasks': pending_tasks,
     }
-    return render(request, 'projects/project_detail.html', context)
+    return render(request, 'base_tailwind/project_detail.html', context)
 
 @login_required
 def project_update(request, pk):
@@ -109,7 +109,7 @@ def project_update(request, pk):
     else:
         form = ProjectUpdateForm(instance=project)
     
-    return render(request, 'projects/project_form.html', {
+    return render(request, 'base_tailwind/project_form.html', {
         'form': form,
         'title': 'Modifier le projet',
         'project': project,
@@ -126,7 +126,7 @@ def project_delete(request, pk):
         messages.success(request, f'Le projet "{project_title}" a été supprimé avec succès!')
         return redirect('Gestion_Projects:project_list')
     
-    return render(request, 'projects/project_confirm_delete.html', {
+    return render(request, 'base_tailwind/project_confirm_delete.html', {
         'project': project
     })
 
@@ -141,7 +141,7 @@ def logout_view(request):
     if request.method == 'POST':
         logout(request)
         messages.info(request, "Vous êtes déconnecté.")
-        return redirect('login')
+        return redirect('logout')
     # If accessed by GET, don't log out — just redirect to projects list
     return redirect('Gestion_Projects:project_list')
 
