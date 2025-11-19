@@ -104,6 +104,12 @@
     <!-- ===== Blog Grid Start ===== -->
     <section class="ji gp uq">
       <div class="bb ye ki xn vq jb jo">
+          <div class="animate_top flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+            <!-- Bouton éditer -->
+            <a href="{% url 'Notes:Add_Note' %}" class="ek jk lk gh gi vc _d _l" style="height: 40px; width: 40px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-size: 25px;"> 
+              +
+            </a>
+          </div><br>
         <div class="wc qf pn xo zf iq">
           <!-- Blog Item -->
           {% for Note in Notes %}
@@ -115,7 +121,7 @@
                 <div class="tc uf wf ag jq">
                   <div class="tc wf ag">
                     <img src="{% static 'images/icon-calender.svg' %}" alt="Date">
-                    <p>{{ Note.created_at|date:"d M, Y" }}</p>
+                    <p>{{ Note.update_at|date:"d M, Y" }}</p>
                   </div>
                 </div>
                 <h4 class="ek tj ml il kk wm xl eq lb">{{ Note.title }}</h4>
@@ -131,33 +137,6 @@
       </div>
     </section>
     <!-- ===== Blog Grid End ===== -->
-
-    <!-- ===== CTA Start ===== -->
-    <section class="i pg gh ji">
-      <!-- Bg Shape -->
-      <img class="h p q" src="{% static 'images/shape-16.svg' %}" alt="Bg Shape" />
-
-      <div class="bb ye i z-10 ki xn dr">
-        <div class="tc uf sn tn un gg">
-          <div class="animate_left to/2">
-            <h2 class="fk vj zp pr lk ac">
-              Join with 5000+ Startups Growing with Base.
-            </h2>
-            <p class="lk">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc quis nibh lorem. Duis sed odio lorem. In a
-              efficitur leo. Ut venenatis rhoncus.
-            </p>
-          </div>
-          <div class="animate_right bf">
-            <a href="#!" class="vc ek kk hh rg ol il cm gi hi">
-              Get Started Now
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== CTA End ===== -->
   </main>
   <!-- ===== Footer Start ===== -->
   <footer>

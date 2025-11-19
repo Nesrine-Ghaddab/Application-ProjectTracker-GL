@@ -106,7 +106,7 @@
     <div class="bb ye ki xn vq jb jo">
 
           <div class="animate_top flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-            <!-- Bouton éditer -->
+            <!-- Bouton retour -->
             <a href="{% url 'Notes:index' %}" class="ek jk lk gi hi rg ml il vc _d _l"> 
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-left" class="lucide lucide-arrow-left w-4 h-4"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
             </a>
@@ -122,7 +122,7 @@
             </h1>
             <span class="text-xs opacity-60 shrink-0 inline-flex items-center gap-1 whitespace-nowrap">
               <img src="{% static 'images/icon-calender.svg' %}" alt="Date" class="w-4 h-4">
-              {{ note.created_at|date:"d/m/Y" }}
+              {{ note.update_at|date:"d/m/Y" }}
             </span>
           </div><br>
 

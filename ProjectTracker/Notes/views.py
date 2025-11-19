@@ -32,4 +32,4 @@ def edit_note(request, note_id):
 			return redirect('Notes:Details_Note', note_id=note.id)
 	else:
 		form = NoteForm(instance=note)
-	return render(request, "Notes/Edit_Note.html", {"note":form, "note_id": note_id, "date_creation": note.created_at})
+	return render(request, "Notes/Edit_Note.html", {"note":form, "note_id": note_id, "date_update": note.update_at})
