@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meetings | Personal Meeting Tracker</title>
+  {% load static %}
+  <link rel="icon" href="favicon.ico">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+
+<body
+  x-data="{ page: 'meetings', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="
+         darkMode = JSON.parse(localStorage.getItem('darkMode'));
+         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+  <!-- ===== Header Start ===== -->
+  <header class="g s r vd ya cj" :class="{ 'hh sm _k dj bl ll' : stickyMenu }"
+    @scroll.window="stickyMenu = (window.pageYOffset > 20) ? true : false">
+    <div class="bb ze ki xn 2xl:ud-px-0 oo wf yf i">
+      <div class="vd to/4 tc wf yf">
+        <a href="{% url 'reunion_list' %}">
+          <span class="ek vj kk wm">Meeting Tracker</span>
+        </a>
+
+        <!-- Hamburger Toggle BTN -->
+        <button class="po rc" @click="navigationOpen = !navigationOpen">
+          <span class="rc i pf re pd">
+            <span class="du-block h q vd yc">
+              <span class="rc i r s eh um tg te rd eb ml jl dl" :class="{ 'ue el': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl fl" :class="{ 'ue qr': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl gl" :class="{ 'ue hl': !navigationOpen }"></span>
+            </span>
+            <span class="du-block h q vd yc lf">
+              <span class="rc eh um tg ml jl el h na r ve yc" :class="{ 'sd dl': !navigationOpen }"></span>
+              <span class="rc eh um tg ml jl qr h s pa vd rd" :class="{ 'sd rr': !navigationOpen }"></span>
+            </span>
+          </span>
+        </button>
+        <!-- Hamburger Toggle BTN -->
+      </div>
+
+      <div class="vd wo/4 sd qo f ho oo wf yf" :class="{ 'd hh rm sr td ud qg ug jc yh': navigationOpen }">
+        <nav>
+          <ul class="tc _o sf yo cg ep">
+            <li><a href="{% url 'reunion_list' %}" class="xl mk">All Meetings</a></li>
+            <li><a href="{% url 'reunion_create' %}" class="xl">Add Meeting</a></li>
+            <li><a href="{% url 'reminderlog_list' %}" class="xl">Reminder Logs</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Header End ===== -->
+
+  <main>
+    <!-- ===== Meetings List Start ===== -->
+    <section class="gj qp gr hj rp hr">
+      <div class="bb ze ki xn 2xl:ud-px-0">
+        <div class="tc sf yo zf kq">
+          <div class="ro">
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-7.5 md:p-10">
+              <div class="tc wf yf ap">
+                <h1 class="ek vj 2xl:ud-text-title-lg kk wm nb gb">All Meetings</h1>
+                <a href="{% url 'reunion_create' %}" class="lk gh dk rg tc wf xf _l gi hi">Schedule New Meeting</a>
+              </div>
+              
+              <!-- Meetings List -->
+              <div class="qb">
+                {% for reunion in reunions %}
+                <div class="tc wf cg ap qb pn dg cb rounded-md border border-stroke dark:border-strokedark p-5">
+                  <div class="vd wo/5">
+                    <h3 class="wj kk wm xl">{{ reunion.title }}</h3>
+                    <p class="sc"><strong>Date:</strong> {{ reunion.date }}</p>
+                    <p class="sc"><strong>Time:</strong> {{ reunion.start_time }} - {{ reunion.end_time }}</p>
+                    <p class="sc"><strong>Type:</strong> {{ reunion.get_reunion_type_display }}</p>
+                    <p class="sc"><strong>Subject:</strong> {{ reunion.get_subject_display }}</p>
+                    <p class="sc">
+                      <strong>Reminder:</strong> 
+                      {% if reunion.reminder_enabled %}
+                        <span class="lk gh dk rg si ti">{{ reunion.get_reminder_timing_display }}</span>
+                      {% else %}
+                        <span class="lk kh dk rg si ti">Disabled</span>
+                      {% endif %}
+                    </p>
+                    {% if reunion.description %}
+                    <p class="sc"><strong>Description:</strong> {{ reunion.description|truncatewords:20 }}</p>
+                    {% endif %}
+                  </div>
+                  <div class="tc wf sf cg vn">
+                    <a href="{% url 'reunion_detail' reunion.pk %}" class="ek pk xl rg gi hi">View Details</a>
+                    <a href="{% url 'reunion_update' reunion.pk %}" class="lk oh dk rg gi hi">Edit</a>
+                    <a href="{% url 'reunion_delete' reunion.pk %}" class="lk kh dk rg gi hi">Delete</a>
+                  </div>
+                </div>
+                {% empty %}
+                <div class="tc wf cg ap qb pn dg cb rounded-md border border-stroke dark:border-strokedark p-5">
+                  <div class="tc">
+                    <h3 class="wj kk wm xl">No meetings scheduled yet.</h3>
+                    <p class="sc">Get started by scheduling your first meeting!</p>
+                    <a href="{% url 'reunion_create' %}" class="lk gh dk rg tc wf xf _l gi hi qb">Schedule Your First Meeting</a>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="jn/2 so">
+            <!-- Quick Stats -->
+            <div class="animate_top fb rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-5">
+              <h4 class="tj kk wm qb">Quick Stats</h4>
+              <div class="qb">
+                <div class="tc wf yf">
+                  <span class="ek vj kk wm">{{ reunions.count }}</span>
+                  <span class="sc">Total Meetings</span>
+                </div>
+                <div class="tc wf yf">
+                  <span class="ek vj kk wm">{{ reunions|length }}</span>
+                  <span class="sc">Upcoming</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-5">
+              <h4 class="tj kk wm qb">Quick Actions</h4>
+              <ul>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion_create' %}">Schedule Meeting</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reminderlog_list' %}">View Reminders</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion_list' %}">All Meetings</a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Upcoming Meetings -->
+            <div class="animate_top fb rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-5">
+              <h4 class="tj kk wm qb">Recently Added</h4>
+              <div class="qb">
+                {% for reunion in reunions|slice:":3" %}
+                <div class="tc fg 2xl:ud-gap-6 qb">
+                  <div class="tc wf yf">
+                    <h5 class="wj kk wm xl bn ml il">{{ reunion.title }}</h5>
+                    <p class="sc">{{ reunion.date }} at {{ reunion.start_time }}</p>
+                  </div>
+                </div>
+                {% empty %}
+                <p class="sc">No recent meetings</p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ===== Meetings List End ===== -->
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <!-- Footer Top -->
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+          <div class="animate_top zd/2 to/4">
+            <a href="{% url 'reunion_list' %}">
+              <span class="ek vj kk wm">Meeting Tracker</span>
+            </a>
+            <p class="lc fb">Organize and track all your meetings in one place.</p>
+          </div>
+
+          <div class="vd ro tc sf rn un gg vn">
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Navigation</h4>
+              <ul>
+                <li><a href="{% url 'reunion_list' %}" class="sc xl vb">All Meetings</a></li>
+                <li><a href="{% url 'reunion_create' %}" class="sc xl vb">Add Meeting</a></li>
+                <li><a href="{% url 'reminderlog_list' %}" class="sc xl vb">Reminder Logs</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Top -->
+
+      <!-- Footer Bottom -->
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <p>&copy; 2024 Personal Meeting Tracker. All rights reserved.</p>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+    </div>
+  </footer>
+
+  <!-- ===== Footer End ===== -->
+
+  <!-- ====== Back To Top Start ===== -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a" @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+    @scroll.window="scrollTop = (window.pageYOffset > 50) ? true : false" :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path
+        d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+  <!-- ====== Back To Top End ===== -->
+</body>
+
+</html>
