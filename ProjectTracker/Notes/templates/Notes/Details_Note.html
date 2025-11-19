@@ -134,11 +134,16 @@
             </p>
           </article><br>
 
-
           <div class="flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
             <!-- Bouton éditer -->
             <a href="{% url 'Notes:Edit_Note' note_id=note.id %}" class="ek jk lk gh gi hi rg ml il vc _d _l"> 
               Éditer
+            </a>
+            <!-- Bouton supprimer -->
+            <a href="{% url 'Notes:Delete_Note' note_id=note.id %}" class="ek jk lk gh gi hi rg ml il vc _d " style="background-color:brown; box-shadow:0 0 0 transparent; transition:box-shadow 0.3s ease;"
+              onmouseover="this.style.boxShadow='0px 10px 25px rgba(255,78,78,0.2)'"
+              onmouseout="this.style.boxShadow='0 0 0 transparent'">
+              Supprimer
             </a>
           </div>
         </div>

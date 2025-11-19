@@ -33,3 +33,8 @@ def edit_note(request, note_id):
 	else:
 		form = NoteForm(instance=note)
 	return render(request, "Notes/Edit_Note.html", {"note":form, "note_id": note_id, "date_update": note.update_at})
+
+def delete_note(request, note_id):
+	note = Note.objects.get(pk = note_id)
+	note.delete()
+	return redirect('Notes:index')

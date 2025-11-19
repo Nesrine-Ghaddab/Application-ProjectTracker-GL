@@ -1829,6 +1829,10 @@ h1,  h2,  h3,  h4,  h5,  h6{
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.red_halo:hover{
+  box-shadow: 0px 10px 25px rgba(255, 78, 78, 0.2);
+}
+
 .am:hover{
   --tw-shadow: 0px 6px 90px rgba(8, 14, 40, 0.04);
   --tw-shadow-colored: 0px 6px 90px var(--tw-shadow-color);
