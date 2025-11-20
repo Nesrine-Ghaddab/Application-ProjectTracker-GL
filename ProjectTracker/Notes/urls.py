@@ -9,5 +9,8 @@ urlpatterns = [
 	path('DetailsNote/<int:note_id>/', views.details_note, name='Details_Note'),
 	path('DetailsNote/EditNote/<int:note_id>/', views.edit_note, name='Edit_Note'),
 	path('Details/Note/EditNote/<int:note_id>/Delete', views.delete_note, name='Delete_Note'),
-	path('AddTag/', views.add_tag, name='Add_Tag')
+	path('DetailsTags/', views.details_tags, name='Details_Tags'),
+	path('DetailsTags/AddTag/', views.add_tag, name='Add_Tag'),
+	path('DetailsTags/EditTag/<int:tag_id>/', views.edit_tag, name='Edit_Tag'),
+	path('DetailsTags/DeleteTag/<int:tag_id>/', views.delete_tag, name='Delete_Tag')
 ]

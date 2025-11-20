@@ -39,9 +39,29 @@ def delete_note(request, note_id):
 	note.delete()
 	return redirect('Notes:index')
 
+def details_tags(request):
+	tags = Tag.objects.all()
+	context = {"tags":tags}
+	return render(request, "Notes/Details_Tags.html", context)
+
 def add_tag(request):
     if request.method == "POST":
         tag_name = request.POST.get("new_tag")
         if tag_name:
             Tag.objects.create(name=tag_name)
-        return redirect("Notes:index")
+        return redirect("Notes:Details_Tags")
+
+def edit_tag(request, tag_id):
+    tag = Tag.objects.get(pk=tag_id)
+    if request.method == "POST":
+        new_name = request.POST.get("name")
+        if new_name:
+            tag.name = new_name
+            tag.save()
+    return redirect("Notes:Details_Tags")
+
+
+def delete_tag(request, tag_id):
+	tag = Tag.objects.get(pk = tag_id)
+	tag.delete()
+	return redirect("Notes:Details_Tags")
