@@ -16,3 +16,8 @@ class NoteForm(forms.ModelForm):
                 'placeholder': 'Écris ta note…'
             }),
         }
+
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = ['name']

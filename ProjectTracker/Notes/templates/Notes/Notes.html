@@ -104,12 +104,35 @@
     <!-- ===== Blog Grid Start ===== -->
     <section class="ji gp uq">
       <div class="bb ye ki xn vq jb jo">
-          <div class="animate_top flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-            <!-- Bouton éditer -->
-            <a href="{% url 'Notes:Add_Note' %}" class="ek jk lk gh gi vc _d _l" style="height: 40px; width: 40px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-size: 25px;"> 
-              +
-            </a>
-          </div><br>
+
+      <div class="animate_top gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800" style="display: flex; justify-content: left; gap: 10px;">
+        <!-- Bouton ajouter une note -->
+        <a href="{% url 'Notes:Add_Note' %}" 
+          class="ek jk lk gh vc _d _l" 
+          style="width: 40px; height: 40px; border-radius: 50%; font-size: 25px; display: flex; justify-content: center; align-items: center;">
+          +
+        </a>
+
+        <!-- Bouton ajouter des tags -->
+        <a href="#" 
+          class="ek jk lk gh vc _d _l" 
+          style="width: 40px; height: 40px; border-radius: 50%; font-size: 25px; display: flex; justify-content: center; align-items: center;"
+          onclick="document.getElementById('tag-section').toggleAttribute('hidden')">
+          #
+        </a>
+
+        <!-- Section inline stylisée -->
+        <div id="tag-section" hidden class="mt-3">
+          <form method="POST" action="{% url 'Notes:Add_Tag' %}">
+            {% csrf_token %}
+            <input type="text" name="new_tag"
+                  placeholder="Écrire un tag..."
+                  class="ek jk lk vc _d"
+                  style="width: 150px; height: 35px; border-radius: 20px; font-size: 14px; padding: 0 10px; border: 1px solid #ccc; display: inline-flex; align-items: center; color: black;" />
+          </form>
+        </div>
+        </div><br>
+
         <div class="wc qf pn xo zf iq">
           <!-- Blog Item -->
           {% for Note in Notes %}

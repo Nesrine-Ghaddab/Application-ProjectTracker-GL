@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Note, Tag
-from .forms import NoteForm
+from .forms import NoteForm, TagForm
 
 # Create your views here.
 def index(request):
@@ -38,3 +38,10 @@ def delete_note(request, note_id):
 	note = Note.objects.get(pk = note_id)
 	note.delete()
 	return redirect('Notes:index')
+
+def add_tag(request):
+    if request.method == "POST":
+        tag_name = request.POST.get("new_tag")
+        if tag_name:
+            Tag.objects.create(name=tag_name)
+        return redirect("Notes:index")
