@@ -131,6 +131,22 @@
               class="ek tj ml il kk wm xl eq lb w-full bg-transparent border-none focus:outline-none resize-none text-sm opacity-90 whitespace-pre-wrap break-words leading-relaxed"
               style="font-size: 120%; font-weight: normal; font-family: 'Inter', sans-serif; word-break: break-word; overflow-wrap: anywhere; background: transparent; resize: none;"
               placeholder="Écris ta note ici...">{{ note.content.value }}</textarea>
+            
+              <!-- Tags -->
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Tags :</label>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              {% for tag in note.fields.tags.queryset %}
+                <label
+                  style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border:2px solid #64748b; border-radius:12px; background:transparent;">
+                  <input type="checkbox" name="tags" value="{{ tag.id }}"
+                        {% if tag in note_object.tags.all %}checked{% endif %}/>
+                  <span style="font-size:0.9rem; color:#e5e7eb;">#{{ tag.name }}</span>
+                </label>
+              {% endfor %}
+            </div>
+            </div><br>
 
             <!-- Actions -->
             <div class="flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
