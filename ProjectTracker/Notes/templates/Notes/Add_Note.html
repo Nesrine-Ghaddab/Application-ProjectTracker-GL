@@ -125,6 +125,22 @@
               style="font-size: 120%; font-weight: normal; font-family: 'Inter', sans-serif; word-break: break-word; overflow-wrap: anywhere; background: transparent; resize: none;"
               placeholder="Écris ta note ici...">{{ form.content.value|default:'' }}</textarea>
 
+              <!-- Tags -->
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Tags :</label>
+
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                {% for tag in form.fields.tags.queryset %}
+                  <label
+                    style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border:2px solid #64748b; border-radius:12px; background:transparent;">
+                    <input type="checkbox" name="tags" value="{{ tag.id }}" />
+                    <span style="font-size:0.9rem; color:#e5e7eb;">#{{ tag.name }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div><br>
+
+
             <!-- Actions -->
             <div class="flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
               <button type="submit" class="ek jk lk gh gi hi rg ml il vc _d _l">Créer</button>
