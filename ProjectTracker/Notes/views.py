@@ -7,6 +7,17 @@ def index(request):
 	context = {"Notes" : Note.objects.all()}
 	return render(request, "Notes/Notes.html", context)
 
+def search_results(request):
+	search_input = request.GET.get("search_name")
+	print(search_input)
+	search_notes = []
+
+	if search_input:
+		search_notes = Note.objects.filter(title__icontains = search_input)
+		context = {"search_notes" : search_notes}
+		return render(request, "Notes/Notes.html", context)
+	return redirect('Notes:index')
+
 def new_note(request):
 	if request.method == 'POST':
 		form = NoteForm(request.POST)

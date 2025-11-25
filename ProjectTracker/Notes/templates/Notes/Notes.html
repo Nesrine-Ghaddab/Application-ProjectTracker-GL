@@ -105,6 +105,15 @@
     <section class="ji gp uq">
       <div class="bb ye ki xn vq jb jo">
 
+      <!-- Barre de recherche par nom -->
+      <div class="animate_top gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800" style="display: flex; justify-content: left; gap: 10px;">
+         <form method="GET" action="{% url 'Notes:search_results' %}">
+          <input type="search" name="search_name" placeholder="Recherche par nom..."
+                style="width: 200px; height: 35px; border-radius: 20px; font-size: 14px; padding: 0 10px; border: 1px solid #ccc; display: inline-flex; align-items: center; color: black; margin-top: 10px;">
+         </form>
+      </div><br>
+
+      <!-- Boutons -->
       <div class="animate_top gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800" style="display: flex; justify-content: left; gap: 10px;">
         <!-- Bouton ajouter une note -->
         <a href="{% url 'Notes:Add_Note' %}" 
@@ -121,8 +130,31 @@
         </a>
       </div><br>
 
-        <div class="wc qf pn xo zf iq">
-          <!-- Blog Item -->
+      <div class="wc qf pn xo zf iq">
+        {% if search_notes %}
+          {% for Note in search_notes %}
+          <!-- Conteneur de note -->
+          <a href="{% url 'Notes:Details_Note' note_id=Note.id %}">
+            <div class="animate_top sg vk rm xm  max-h-60 overflow-hidden">
+              <!-- Métadonnées + titre -->
+              <div class="yh">
+                <div class="tc uf wf ag jq">
+                  <div class="tc wf ag">
+                    <img src="{% static 'images/icon-calender.svg' %}" alt="Date">
+                    <p>{{ Note.update_at|date:"d M, Y" }}</p>
+                  </div>
+                </div>
+                <h4 class="ek tj ml il kk wm xl eq lb">{{ Note.title }}</h4>
+
+                <!-- Aperçu du contenu -->
+                <p class="text-sm opacity-90 leading-relaxed mt-2 break-words"
+                  style="word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">{{ Note.content|truncatechars:74 }}
+                </p>
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        {% else %}
           {% for Note in Notes %}
           <!-- Conteneur de note -->
           <a href="{% url 'Notes:Details_Note' note_id=Note.id %}">
@@ -145,6 +177,7 @@
             </div>
           </a>
           {% endfor %}
+        {% endif %}
       </div>
     </section>
     <!-- ===== Blog Grid End ===== -->
