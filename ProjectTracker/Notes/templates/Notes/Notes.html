@@ -105,12 +105,19 @@
     <section class="ji gp uq">
       <div class="bb ye ki xn vq jb jo">
 
-      <!-- Barre de recherche par nom -->
+      <!-- Barre de recherche par nom + recherche par tag -->
       <div class="animate_top gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800" style="display: flex; justify-content: left; gap: 10px;">
-         <form method="GET" action="{% url 'Notes:search_results' %}">
+        <form method="GET" action="{% url 'Notes:search_results' %}">
           <input type="search" name="search_name" placeholder="Recherche par nom..."
                 style="width: 200px; height: 35px; border-radius: 20px; font-size: 14px; padding: 0 10px; border: 1px solid #ccc; display: inline-flex; align-items: center; color: black; margin-top: 10px;">
-         </form>
+        </form>
+				<form method="GET" action="{% url 'Notes:search_results' %}">
+						{% csrf_token %}
+						{{ tags.as_p }}
+						<script>
+							document.querySelector('select[name="tags"]').setAttribute('onchange', 'this.form.submit()');
+						</script>
+				</form>
       </div><br>
 
       <!-- Boutons -->

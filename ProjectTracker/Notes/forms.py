@@ -25,3 +25,15 @@ class TagForm(forms.ModelForm):
     class Meta:
         model = Tag
         fields = ['name']
+
+class SearchTagForm(forms.ModelForm):
+    tags = forms.ModelChoiceField(queryset=Tag.objects.all(), label = False)
+
+    class Meta:
+        model = Tag
+        fields = ['tags']
+        widgets = {
+            'tags': forms.Select(attrs={
+                'class': 'w-full border border-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400'
+            })
+        }

@@ -1,22 +1,32 @@
 from django.shortcuts import render, redirect
 from .models import Note, Tag
-from .forms import NoteForm, TagForm
+from .forms import NoteForm, TagForm, SearchTagForm
 
 # Create your views here.
 def index(request):
-	context = {"Notes" : Note.objects.all()}
+	tags = SearchTagForm()
+	context = {"Notes" : Note.objects.all(), "tags" : tags}
 	return render(request, "Notes/Notes.html", context)
 
 def search_results(request):
+	# Filter using the notes name
 	search_input = request.GET.get("search_name")
-	print(search_input)
-	search_notes = []
+	form_tag = SearchTagForm(request.GET)
+	notes = Note.objects.all()
+	tags = SearchTagForm()
 
 	if search_input:
-		search_notes = Note.objects.filter(title__icontains = search_input)
-		context = {"search_notes" : search_notes}
-		return render(request, "Notes/Notes.html", context)
-	return redirect('Notes:index')
+		notes = notes.filter(title__icontains=search_input)
+	
+	if form_tag.is_valid():
+		search_tag = form_tag.cleaned_data.get('tags')
+		if search_tag:
+			notes = notes.filter(tags__name=search_tag)
+
+	if notes == Note.objects.all():
+		return redirect('Notes:index')
+	return render(request, 'Notes/Notes.html', {'search_notes':notes, 'tags' : tags})
+
 
 def new_note(request):
 	if request.method == 'POST':
