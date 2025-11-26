@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Note, Tag
 from .forms import NoteForm, TagForm, SearchTagForm
 
-# Create your views here.
+#  =========== NOTES ===========
 def index(request):
 	tags = SearchTagForm()
 	context = {"Notes" : Note.objects.all(), "tags" : tags}
@@ -60,6 +60,8 @@ def delete_note(request, note_id):
 	note.delete()
 	return redirect('Notes:index')
 
+#  =========== TAGS ===========
+
 def details_tags(request):
 	tags = Tag.objects.all()
 	context = {"tags":tags}
@@ -85,4 +87,13 @@ def edit_tag(request, tag_id):
 def delete_tag(request, tag_id):
 	tag = Tag.objects.get(pk = tag_id)
 	tag.delete()
+	return redirect("Notes:Details_Tags")
+
+def clear_unused_tags(request):
+	tags = Tag.objects.all()
+	notes = Note.objects.all()
+
+	for tag in tags:
+		if not(Note.objects.all().filter(tags__name=tag)):
+			tag.delete()
 	return redirect("Notes:Details_Tags")

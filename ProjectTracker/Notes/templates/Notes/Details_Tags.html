@@ -188,8 +188,8 @@
           }
           </script>
           <!-- Boutons -->
-          <div class="flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800" style="display: flex; justify-content: left; gap: 10px;">
-            <!-- Bouton éditer -->
+          <div class="flex gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800" style="display: flex; justify-content:flex-start; gap: 10px;">
+            <!-- Bouton ajout tag -->
             <a href="#" class="ek jk lk gh gi hi rg ml il vc _d _l"
               onclick="document.getElementById('tag-section').toggleAttribute('hidden')"> 
                 New Tag
@@ -204,8 +204,10 @@
                       style="width: 150px; height: 35px; border-radius: 20px; font-size: 14px; padding: 0 10px; border: 1px solid #ccc; display: inline-flex; align-items: center; color: black; margin-top: 10px;" />
               </form>
             </div>
-            <!-- Bouton clear unused tags -->
-
+              <!-- Bouton ajout tag -->
+              <a href="{% url 'Notes:Clear_unused_tags' %}" class="ek jk lk gh gi hi rg ml il vc _d _l" style="margin-left: auto;"> 
+                  Clear tags
+              </a>
           </div>
         </div>
       </div>
