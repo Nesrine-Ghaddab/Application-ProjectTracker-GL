@@ -83,13 +83,18 @@ class Reunion(models.Model):
     @property
     def needs_reminder(self):
         """Check if reminder needs to be sent"""
-        if not self.reminder_enabled or self.reminder_sent or not self.is_upcoming:
+        if not self.reminder_enabled or self.reminder_sent:
             return False
-        
+
         reminder_time = self.reminder_datetime
-        if reminder_time and reminder_time <= timezone.now():
-            return True
-        return False
+        if reminder_time is None:
+            return False
+
+        now = timezone.now()
+
+        # Send when reminder time has passed, and up to 5 minutes after start
+        window_end = self.datetime + timedelta(minutes=5)
+        return reminder_time <= now <= window_end
     
     class Meta:
         ordering = ['-date', '-start_time']

@@ -3,12 +3,23 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from .models import Reunion, ReminderLog
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.utils import timezone
 
 class ReunionList(ListView):
     model = Reunion
     context_object_name = "reunions"
-    ordering = ["-date", "-start_time"]
-    template_name = "meeting.html"  # Make sure this matches your actual file name
+    ordering = ["date", "start_time"]
+    template_name = "meeting.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        context["upcoming_reunions"] = (
+            Reunion.objects
+            .filter(date__gte=now.date())
+            .order_by("date", "start_time")[:3]
+        )
+        return context
 
 class ReunionDetail(DetailView):
     model = Reunion

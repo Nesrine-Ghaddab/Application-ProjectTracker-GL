@@ -37,8 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'PersonalTracker',
     'Reunion',
+    'UserApp',
+]
+CRONJOBS = [
+    ('*/1 * * * *', 'Reunion.cron.send_reminders'),  
 ]
 
 MIDDLEWARE = [
@@ -141,3 +146,9 @@ static_dir.mkdir(exist_ok=True)
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# settings.py
+TIME_ZONE = "Africa/Tunis"
+USE_TZ = True
+AUTH_USER_MODEL = "UserApp.User"
+
+
