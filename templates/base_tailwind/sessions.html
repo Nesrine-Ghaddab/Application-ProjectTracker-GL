@@ -446,17 +446,18 @@
       if(!r.ok) throw new Error('start failed');
       return r.json();
     }
-    async function apiStop(id){
-      const fd = new FormData();
-      fd.append('session_id', id);
-      const r = await fetch("{% url 'study:api_session_stop' %}", {
-        method:'POST',
-        headers:{'X-CSRFToken':csrftoken},
-        body:fd
-      });
-      if(!r.ok) throw new Error('stop failed');
-      return r.json();
-    }
+   async function apiStop(id){
+  const fd = new FormData();
+  fd.append('session_id', id);
+  const r = await fetch("{% url 'study:api_session_stop' %}", {
+    method:'POST',
+    headers:{'X-CSRFToken':csrftoken},
+    body:fd
+  });
+  if(!r.ok) throw new Error('stop failed');
+  return r.json();   // <--- IMPORTANT
+}
+
     async function apiSummary(){
       const r = await fetch("{% url 'study:api_summary' %}");
       if(!r.ok) throw new Error('summary failed');
@@ -638,23 +639,31 @@
 
     // STOP
     btnStop.addEventListener('click', async () => {
-      try{
-        await apiStop(runningId);
-        pauseLocal();
-        runningId = "";
-        setRunningUI(false);
-        beep(520, 250);
-        notify('Session stopped!');
-        const sum = await apiSummary();
-        renderRecent(sum.recent);
-        setStats(sum);
-        isBreak = false;
-        remaining = (parseInt(inpStudy.value || '50', 10)) * 60;
-        updateDisplay();
-      }catch{
-        toast('Error stopping session');
-      }
-    });
+  try{
+    const data = await apiStop(runningId);
+
+    pauseLocal();
+    runningId = "";
+    setRunningUI(false);
+    beep(520, 250);
+    notify('Session stopped!');
+
+    // ouvrir automatiquement le PDF dans un nouvel onglet
+    if (data.pdf_url) {
+      window.open(data.pdf_url, '_blank');
+    }
+
+    const sum = await apiSummary();
+    renderRecent(sum.recent);
+    setStats(sum);
+    isBreak = false;
+    remaining = (parseInt(inpStudy.value || '50', 10)) * 60;
+    updateDisplay();
+  }catch{
+    toast('Error stopping session');
+  }
+});
+
 
     btnPause.addEventListener('click', () => {
       timer ? pauseLocal() : startLocal();
