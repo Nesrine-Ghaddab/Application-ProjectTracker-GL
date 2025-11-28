@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from .models import StudySession
 from .forms import StudySessionForm
 
+from django.db.models import Sum
 
 # ========== PAGES ==========
 
@@ -159,9 +160,24 @@ def session_list(request):
         .filter(user=request.user)
         .order_by('-started_at')
     )
-    return render(request, "base_tailwind/sessions_history.html", {
-        "sessions": sessions,
-    })
+
+    # total duration for all sessions (in seconds)
+    agg = sessions.aggregate(total_sec=Sum('duration_seconds'))
+    total_seconds = agg['total_sec'] or 0
+
+    # convert to hours / minutes
+    total_hours = total_seconds // 3600
+    total_minutes = (total_seconds % 3600) // 60
+
+    return render(
+        request,
+        "base_tailwind/sessions_history.html",
+        {
+            "sessions": sessions,
+            "total_hours": total_hours,
+            "total_minutes": total_minutes,
+        },
+    )
 
 
 @login_required

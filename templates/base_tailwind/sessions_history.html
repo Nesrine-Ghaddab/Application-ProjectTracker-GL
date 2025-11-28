@@ -1,12 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Historique des sessions – Personal Tracker</title>
+  <title>Session History – Personal Tracker</title>
 
   <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
   <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
@@ -107,7 +107,7 @@
               <svg :class="{ 'wn' : page === 'home', 'xh' : page === 'home' && stickyMenu }" class="th om" width="25"
                 height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
-                  d="M12.0908 18.6363C10.3549 18.6363 8.69 17.9467 7.46249 16.7192C6.23497 15.4916 5.54537 13.8268 5.54537 12.0908C5.54537 10.3549 6.23497 8.69 7.46249 7.46249C8.69 6.23497 10.3549 5.54537 12.0908 5.54537C13.8268 5.54537 15.4916 6.23497 16.7192 7.46249C17.9467 8.69 18.6363 10.3549 18.6363 12.0908C18.6363 13.8268 17.9467 15.4916 16.7192 16.7192C15.4916 17.9467 13.8268 18.6363 12.0908 18.6363ZM10.9999 0.0908203H13.1817V3.36355H10.9999V0.0908203ZM10.9999 20.8181H13.1817V24.0908H10.9999V20.8181ZM2.83446 4.377L4.377 2.83446L6.69082 5.14828L5.14828 6.69082L2.83446 4.37809V4.377ZM17.4908 19.0334L19.0334 17.4908L21.3472 19.8046L19.8046 21.3472L17.4908 19.0334ZM19.8046 2.83337L21.3472 4.377L19.0334 6.69082L17.4908 5.14828L19.8046 2.83446V2.83337ZM5.14828 17.4908L6.69082 19.0334L4.377 21.3472L2.83446 19.8046L5.14828 17.4908ZM24.0908 10.9999V13.1817H20.8181V10.9999H24.0908ZM3.36355 10.9999V13.1817H0.0908203V10.9999H3.36355Z"
+                  d="M12.0908 18.6363C10.3549 18.6363 8.69 17.9467 7.46249 16.7192C6.23497 15.4916 5.54537 13.8268 5.54537 12.0908C5.54537 10.3549 6.23497 8.69 7.46249 7.46249C8.69 6.23497 10.3549 5.54537 12.0908 5.54537C13.8268 5.54537 15.4916 6.23497 16.7192 7.46249C17.9467 8.69 18.6363 10.3549 18.6363 12.0908C18.6363 13.8268 17.9467 15.4916 16.7192 16.7192C15.4916 17.9467 13.8268 18.6363 12.0908 18.6363ZM12.0908 16.4545C13.2481 16.4545 14.358 15.9947 15.1764 15.1764C15.9947 14.358 16.4545 13.2481 16.4545 12.0908C16.4545 10.9335 15.9947 9.8236 15.1764 9.00526C14.358 8.18692 13.2481 7.72718 12.0908 7.72718C10.9335 7.72718 9.8236 8.18692 9.00526 9.00526C8.18692 9.8236 7.72718 10.9335 7.72718 12.0908C7.72718 13.2481 8.18692 14.358 9.00526 15.1764C9.8236 15.9947 10.9335 16.4545 12.0908 16.4545ZM10.9999 0.0908203H13.1817V3.36355H10.9999V0.0908203ZM10.9999 20.8181H13.1817V24.0908H10.9999V20.8181ZM2.83446 4.377L4.377 2.83446L6.69082 5.14828L5.14828 6.69082L2.83446 4.37809V4.377ZM17.4908 19.0334L19.0334 17.4908L21.3472 19.8046L19.8046 21.3472L17.4908 19.0334ZM19.8046 2.83337L21.3472 4.377L19.0334 6.69082L17.4908 5.14828L19.8046 2.83446V2.83337ZM5.14828 17.4908L6.69082 19.0334L4.377 21.3472L2.83446 19.8046L5.14828 17.4908ZM24.0908 10.9999V13.1817H20.8181V10.9999H24.0908ZM3.36355 10.9999V13.1817H0.0908203V10.9999H3.36355Z"
                   fill="" />
               </svg>
               <img class="xc nm" src="{% static 'base_tailwind/images/icon-moon.svg' %}" alt="Moon" />
@@ -127,24 +127,24 @@
   <!-- ===== Main Content ===== -->
   <main class="mt-24 lg:mt-28 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    <!-- En-tête de la page -->
+    <!-- Page header -->
     <div class="fade-in mb-8">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-bold mb-2">📋 Historique des sessions</h1>
-          <p class="text-sm opacity-70">Consulte et gère toutes tes sessions d'étude</p>
+          <h1 class="text-3xl font-bold mb-2">📋 Session history</h1>
+          <p class="text-sm opacity-70">View and manage all your study sessions</p>
         </div>
         <a href="{% url 'study:home' %}" 
            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition shadow-lg hover:shadow-xl">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
-          Retour au timer
+          Back to timer
         </a>
       </div>
     </div>
 
-    <!-- Statistiques rapides -->
+    <!-- Quick stats -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 fade-in">
       <div class="stat-card p-5 rounded-2xl border shadow-sm">
         <div class="flex items-center gap-3">
@@ -168,10 +168,11 @@
             </svg>
           </div>
           <div>
-            <div class="text-sm opacity-70">Temps total</div>
-            <div class="text-2xl font-bold text-purple-600">
-              {% widthratio sessions|length 1 45 %}h
-            </div>
+           <div class="text-sm opacity-70">Total time</div>
+<div class="text-2xl font-bold text-purple-600">
+  {{ total_hours }}h {{ total_minutes }}min
+</div>
+
           </div>
         </div>
       </div>
@@ -184,43 +185,43 @@
             </svg>
           </div>
           <div>
-            <div class="text-sm opacity-70">Sessions terminées</div>
+            <div class="text-sm opacity-70">Finished sessions</div>
             <div class="text-2xl font-bold text-green-600">{{ sessions|length }}</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Tableau des sessions -->
+    <!-- Sessions table -->
     <div class="fade-in">
       <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
         
-        <!-- En-tête du tableau -->
+        <!-- Table header -->
         <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b">
           <h2 class="text-lg font-semibold flex items-center gap-2">
             <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
             </svg>
-            Liste complète des sessions
+            Full list of sessions
           </h2>
           <p class="text-xs text-slate-500 mt-1">
-            💡 Tu peux cliquer sur le titre d'une session pour le modifier directement.
+            💡 You can click on a session title to edit it directly.
           </p>
         </div>
 
-        <!-- Tableau responsive -->
+        <!-- Responsive table -->
         <div class="overflow-x-auto">
           <table class="min-w-full">
             <thead class="bg-slate-50 text-slate-600">
               <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                  Titre
+                  Title
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                  Date & Heure
+                  Date & Time
                 </th>
                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                  Durée
+                  Duration
                 </th>
               </tr>
             </thead>
@@ -228,13 +229,13 @@
             <tbody class="divide-y divide-slate-100">
               {% for s in sessions %}
                 <tr class="table-row">
-                  <!-- Titre éditable inline -->
+                  <!-- Inline editable title -->
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
                       <div class="w-2 h-2 rounded-full bg-green-500"></div>
                       <input
                         type="text"
-                        value="{{ s.title|default:'Session sans titre' }}"
+                        value="{{ s.title|default:'Untitled session' }}"
                         data-url="{% url 'study:session_rename' s.pk %}"
                         class="js-session-title w-full bg-transparent border border-transparent rounded-lg px-2 py-1
                                text-sm font-medium text-slate-900
@@ -271,14 +272,14 @@
                       <svg class="mx-auto w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                       </svg>
-                      <h3 class="text-lg font-medium text-slate-600 mb-2">Aucune session enregistrée</h3>
-                      <p class="text-sm text-slate-500 mb-4">Commence une nouvelle session pour voir ton historique ici</p>
+                      <h3 class="text-lg font-medium text-slate-600 mb-2">No sessions yet</h3>
+                      <p class="text-sm text-slate-500 mb-4">Start a new session to see it appear here.</p>
                       <a href="{% url 'study:home' %}" 
                          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Créer une session
+                        Create a session
                       </a>
                     </div>
                   </td>
@@ -288,7 +289,7 @@
           </table>
         </div>
 
-        <!-- Footer du tableau -->
+        <!-- Table footer -->
         {% if sessions %}
         <div class="px-6 py-4 bg-slate-50 border-t">
           <div class="flex items-center justify-between text-sm">
@@ -296,7 +297,7 @@
               Total: <strong class="text-slate-900">{{ sessions|length }}</strong> session{{ sessions|length|pluralize }}
             </span>
             <span class="text-slate-500">
-              Dernière mise à jour: {{ sessions.0.started_at|date:"d/m/Y à H:i" }}
+              Last update: {{ sessions.0.started_at|date:"d/m/Y \\a\\t H:i" }}
             </span>
           </div>
         </div>
@@ -316,9 +317,9 @@
   </button>
   <!-- ====== Back To Top End ===== -->
 
-  <!-- ========= JS: édition inline du titre ========= -->
+  <!-- ========= JS: inline title editing ========= -->
   <script>
-    // Récupération CSRF depuis les cookies
+    // Get CSRF token from cookies
     function getCookie(name) {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {
@@ -352,10 +353,10 @@
           body: formData,
         });
 
-        if (!res.ok) throw new Error('Erreur serveur');
+        if (!res.ok) throw new Error('Server error');
         await res.json();
 
-        // petit feedback visuel
+        // small visual feedback
         input.classList.remove('ring-red-400');
         input.classList.add('ring-1', 'ring-emerald-400');
         setTimeout(() => input.classList.remove('ring-1', 'ring-emerald-400'), 600);
@@ -367,10 +368,10 @@
     }
 
     document.querySelectorAll('.js-session-title').forEach((input) => {
-      // Sauvegarde quand on sort du champ
+      // Save on blur
       input.addEventListener('blur', () => saveTitle(input));
 
-      // Touche Entrée => on blur => save
+      // Enter key => blur => save
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
