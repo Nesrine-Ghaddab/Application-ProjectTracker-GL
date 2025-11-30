@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modifier Profil</title>
+
+  <link rel="icon" href="{% static 'UserApp/favicon.ico' %}">
+  <link href="{% static 'UserApp/style.css' %}" rel="stylesheet">
+</head>
+
+<body x-data="{ page: 'edit_profile', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="
+        darkMode = JSON.parse(localStorage.getItem('darkMode'));
+        $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+
+  <!-- ===== Header Start ===== -->
+  <header class="g s r vd ya cj" :class="{ 'hh sm _k dj bl ll' : stickyMenu }"
+    @scroll.window="stickyMenu = (window.pageYOffset > 20) ? true : false">
+    <div class="bb ze ki xn 2xl:ud-px-0 oo wf yf i">
+      <div class="vd to/4 tc wf yf">
+        <a href="/">
+          <img class="om" src="{% static 'UserApp/images/logo-light.svg' %}" alt="Logo Light">
+          <img class="xc nm" src="{% static 'UserApp/images/logo-dark.svg' %}" alt="Logo Dark">
+        </a>
+
+        <button class="po rc" @click="navigationOpen = !navigationOpen">
+          <span class="rc i pf re pd">
+            <span class="du-block h q vd yc">
+              <span class="rc i r s eh um tg te rd eb ml jl dl" :class="{ 'ue el': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl fl" :class="{ 'ue qr': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl gl" :class="{ 'ue hl': !navigationOpen }"></span>
+            </span>
+          </span>
+        </button>
+      </div>
+
+      <div class="vd wo/4 sd qo f ho oo wf yf"
+        :class="{ 'd hh rm sr td ud qg ug jc yh': navigationOpen }">
+        <nav>
+          <ul class="tc _o sf yo cg ep">
+            <li><a href="/" class="xl">Home</a></li>
+            <li><a href="#" class="xl">Features</a></li>
+
+            <li class="c i" x-data="{ dropdown: false }">
+              <a href="#!" class="xl tc wf yf bg" @click.prevent="dropdown = !dropdown">
+                User Pages
+              </a>
+
+              <ul class="a" :class="{ 'tc': dropdown }">
+                <li><a href="{% url 'profile' %}" class="xl">My Profile</a></li>
+                <li><a href="{% url 'edit_profile' %}" class="xl mk">Edit Profile</a></li>
+                <li><a href="{% url 'logout' %}" class="xl">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="tc wf ig pb no">
+          <a href="{% url 'profile' %}" class="ek pk xl">Retour Profil</a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- ===== Header End ===== -->
+
+
+
+  <!-- ===== Edit Profile Section ===== -->
+  <section class="i pg fh rm ki xn vq gj qp gr hj rp hr">
+
+    <!-- Background Shapes -->
+    <img src="{% static 'UserApp/images/shape-06.svg' %}" class="h j k" alt="Shape">
+    <img src="{% static 'UserApp/images/shape-03.svg' %}" class="h l m" alt="Shape">
+    <img src="{% static 'UserApp/images/shape-17.svg' %}" class="h n o" alt="Shape">
+    <img src="{% static 'UserApp/images/shape-18.svg' %}" class="h p q" alt="Shape">
+
+    <div class="animate_top bb af i va sg hh sm vk xm yi _n jp hi ao kp">
+
+      <div class="rj text-center">
+        <h2 class="ek ck kk wm xb">Modifier mon Profil</h2>
+        <p>Changez vos informations personnelles</p>
+      </div>
+
+      <!-- Django Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <p class="text-red-500 text-center my-2">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+
+      <!-- ====== EDIT PROFILE FORM ====== -->
+      <form class="sb" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- NOM -->
+        <div class="wb">
+          <label class="rc kk wm vb">Nom</label>
+          <input type="text" name="nom" value="{{ form.nom.value|default:'' }}"
+            class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40" placeholder="Nom">
+        </div>
+
+        <!-- PRENOM -->
+        <div class="wb">
+          <label class="rc kk wm vb">Prénom</label>
+          <input type="text" name="prenom" value="{{ form.prprenom.value|default:'' }}"
+            class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40" placeholder="Prénom">
+        </div>
+
+        <!-- EMAIL -->
+        <div class="wb">
+          <label class="rc kk wm vb">Email</label>
+          <input type="email" name="email" value="{{ form.email.value|default:'' }}"
+            class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40" placeholder="Email">
+        </div>
+
+        <!-- PHOTO -->
+        <div class="wb">
+          <label class="rc kk wm vb">Photo de profil</label>
+
+          <div class="text-center my-2">
+            <img src="{{ user.photo.url }}" class="w-24 h-24 rounded-full mx-auto shadow">
+          </div>
+
+          <input type="file" name="photo"
+            class="vd hh rg zk _g ch hm dm fm xi mi sm xm pm dn/40">
+        </div>
+
+        <!-- BUTTON SAVE -->
+        <button class="vd rj ek rc rg gh lk ml il _l gi hi mt-4">
+          Sauvegarder
+        </button>
+
+        <!-- DELETE ACCOUNT -->
+        <div class="text-center mt-4">
+  <a href="{% url 'delete_account' %}"
+     onclick="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');"
+     class="block w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition">
+      Supprimer mon compte
+  </a>
+</div>
+
+
+
+        <p class="sj hk xj rj ob">
+          <a href="{% url 'profile' %}" class="mk">Annuler et retourner au profil</a>
+        </p>
+
+      </form>
+
+    </div>
+  </section>
+
+
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <p class="animate_top">&copy; 2025 Base - Edit Profile Page. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
+
+  <script defer src="{% static 'UserApp/bundle.js' %}"></script>
+
+</body>
+
+</html>
