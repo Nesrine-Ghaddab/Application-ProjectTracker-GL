@@ -7,315 +7,166 @@
     <title>{% block title %}Personal Study & Project Tracker{% endblock %}</title>
     <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
-    <meta name="description" content="Application Web — Suivi d'étude, gestion de projets, tâches, habitudes, notes et analytics." />
-    <meta name="theme-color" content="#0f172a" />
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        // Tailwind config: couleurs personnalisées
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        brand: { 
-                            50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',
-                            300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',
-                            600:'#2563eb',700:'#1d4ed8',800:'#1e40af',
-                            900:'#1e3a8a'
-                        } 
-                    } 
-                } 
-            } 
-        }
-    </script>
-    
-    <!-- Icons (Lucide) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
-    
-    {% block extra_head %}
-    <style>
-    .fade-in { animation: fadeIn .3s ease; }
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-    @keyframes pulseCard {0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
-    @keyframes flashBg {0%{background:#e2e8f0}50%{background:#bfdbfe}100%{background:#e2e8f0}}
-    @keyframes shake {0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-    .timer-card.pulse {animation:pulseCard .8s ease}
-    .timer-card.flash {animation:flashBg 1.2s ease}
-    .timer-card.shake {animation:shake .4s ease}
-    
-    /* Stats cards hover effect */
-    .stat-box {
-      transition: all 0.3s ease;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
-    }
-    .stat-box:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-    }
-    
-    /* Chart containers */
-    .chart-container {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      transition: all 0.3s ease;
-    }
-    .chart-container:hover {
-      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.1);
-      border-color: rgba(59, 130, 246, 0.3);
-    }
-    
-    /* Session list items */
-    .session-item {
-      transition: all 0.2s ease;
-      border-left: 3px solid transparent;
-    }
-    .session-item:hover {
-      background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(249, 250, 251, 1) 100%);
-      border-left-color: #3b82f6;
-      transform: translateX(4px);
-    }
-    
-    /* Timer card gradient */
-    .timer-display {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-      border: 2px solid rgba(59, 130, 246, 0.2);
-    }
-    
-    /* Button styles */
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-    {% endblock %}
+    {% block extra_head %}{% endblock %}
 </head>
-    <body {% block body_attributes %}class="h-full bg-slate-50 text-brand-900 dark:bg-slate-900 dark:text-slate-300" {% block body_x_data %}x-data="{ page: 'home', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"{% endblock body_x_data %} {% block body_x_init %}x-init="
-         darkMode = JSON.parse(localStorage.getItem('darkMode'));
-         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"{% endblock body_x_init %}
-  :class="{'b eh': darkMode === true}"{% endblock body_attributes %}>
-    <!-- Top Nav -->
-    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/70 glass border-b border-slate-200/60 dark:border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
-            <div class="flex items-center gap-2">
-                <div class="h-9 w-9 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 grid place-items-center text-white font-bold">PT</div>
-                    <span class="font-semibold text-brand-900 dark:text-brand-400">Personal Tracker</span>
-            </div>
-            <nav class="ml-6 hidden md:flex items-center gap-2 text-sm">
-                {% if user.is_authenticated %}
-                        <a href="{% url 'Gestion_Projects:project_list' %}" data-onboard="true" data-onboard-order="1" data-onboard-text="Accédez à la liste de vos projets depuis ici." class="nav-btn px-3 py-2 rounded-xl text-brand-900 dark:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-                            Mes Projets
-                        </a>
-                    <form method="post" action="{% url 'Gestion_Projects:logout' %}" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-btn px-3 py-2 rounded-xl text-brand-900 dark:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800">
-                            Déconnexion
-                        </button>
-                    </form>
-                {% endif %}
-            </nav>
-            <div class="ml-auto flex items-center gap-2">
-                <!-- Recherche -->
-                <label class="relative hidden sm:block">
-              <input type="search" name="search" placeholder="Rechercher..." value="{{ search_query|default:'' }}" 
-                  data-onboard="true" data-onboard-order="2" data-onboard-text="Utilisez la recherche pour trouver un projet ou une tâche rapidement." 
-                  class="w-64 rounded-xl bg-slate-100 dark:bg-slate-800/80 px-9 py-2 text-brand-900 dark:text-slate-300 placeholder:text-slate-500 dark:placeholder:text-slate-400 outline-none focus:ring-2 ring-brand-500" />
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 opacity-60"></i>
-                </label>
-                
-                <!-- Dark mode toggle -->
-                <button id="themeToggle" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800" title="Thème clair/sombre">
-                    <i data-lucide="moon" class="w-5 h-5"></i>
-                </button>
-                
-                <!-- Profil -->
-                {% if user.is_authenticated %}
-                    <div class="flex items-center gap-2 px-2 py-1 rounded-xl bg-slate-100 dark:bg-slate-800/80">
-                        <span data-onboard="true" data-onboard-order="4" data-onboard-text="Accédez à votre profil et paramètres ici." class="text-sm font-medium text-brand-900 dark:text-brand-400">{{ user.username }}</span>
-                    <img class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/64?img=13" alt="avatar" />
-                </div>
-                {% else %}
-                <a href="{% url 'login' %}" class="px-3 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white">
-                    Connexion
-                </a>
-                {% endif %}
-            </div>
+
+<body x-data="{ page: 'home', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="darkMode = JSON.parse(localStorage.getItem('darkMode')); $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+  
+  <!-- ===== Header Start ===== -->
+  <header class="g s r vd ya cj" :class="{ 'hh sm _k dj bl ll' : stickyMenu }"
+    @scroll.window="stickyMenu = (window.pageYOffset > 20) ? true : false">
+    <div class="bb ze ki xn 2xl:ud-px-0 oo wf yf i">
+      <div class="vd to/4 tc wf yf">
+        <a href="{% url 'home' %}">
+          <img class="om" src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo Light">
+          <img class="xc nm" src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo Dark">
+        </a>
+
+        <!-- Hamburger Toggle BTN -->
+        <button class="po rc" @click="navigationOpen = !navigationOpen">
+          <span class="rc i pf re pd">
+            <span class="du-block h q vd yc">
+              <span class="rc i r s eh um tg te rd eb ml jl dl" :class="{ 'ue el': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl fl" :class="{ 'ue qr': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl gl" :class="{ 'ue hl': !navigationOpen }"></span>
+            </span>
+            <span class="du-block h q vd yc lf">
+              <span class="rc eh um tg ml jl el h na r ve yc" :class="{ 'sd dl': !navigationOpen }"></span>
+              <span class="rc eh um tg ml jl qr h s pa vd rd" :class="{ 'sd rr': !navigationOpen }"></span>
+            </span>
+          </span>
+        </button>
+      </div>
+
+      <div class="vd wo/4 sd qo f ho oo wf yf" :class="{ 'd hh rm sr td ud qg ug jc yh': navigationOpen }">
+        <nav>
+          <ul class="tc _o sf yo cg ep">
+            <li><a href="{% url 'home' %}" class="xl" :class="{ 'mk': page === 'home' }">Dashboard</a></li>
+            
+            {% if user.is_authenticated %}
+            <li class="c i" x-data="{ dropdown: false }">
+              <a href="#!" class="xl tc wf yf bg" @click.prevent="dropdown = !dropdown">
+                Pages
+                <svg :class="{ 'wh': dropdown }" class="th mm we fd pf" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+                </svg>
+              </a>
+
+              <!-- Dropdown Start -->
+              <ul class="a" :class="{ 'tc': dropdown }">
+                <li><a href="{% url 'Gestion_Projects:project_list' %}" class="xl">Projects & Tasks</a></li>
+                <li><a href="#" class="xl">Sessions</a></li>
+                <li><a href="#" class="xl">Agenda</a></li>
+                <li><a href="#" class="xl">Meetings</a></li>
+                <li><a href="#" class="xl">Habits & Notes</a></li>
+              </ul>
+            </li>
+            {% endif %}
+            
+            <li><a href="#support" class="xl">Support</a></li>
+          </ul>
+        </nav>
+
+        <div class="tc wf ig pb no">
+          <div class="pc h io pa ra" :class="navigationOpen ? '!-ud-visible' : 'd'">
+            <label class="rc ab i">
+              <input type="checkbox" :value="darkMode" @change="darkMode = !darkMode" class="pf vd yc uk h r za ab" />
+              <svg :class="{ 'wn' : page === 'home', 'xh' : page === 'home' && stickyMenu }" class="th om" width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.0908 18.6363C10.3549 18.6363 8.69 17.9467 7.46249 16.7192C6.23497 15.4916 5.54537 13.8268 5.54537 12.0908C5.54537 10.3549 6.23497 8.69 7.46249 7.46249C8.69 6.23497 10.3549 5.54537 12.0908 5.54537C13.8268 5.54537 15.4916 6.23497 16.7192 7.46249C17.9467 8.69 18.6363 10.3549 18.6363 12.0908C18.6363 13.8268 17.9467 15.4916 16.7192 16.7192C15.4916 17.9467 13.8268 18.6363 12.0908 18.6363ZM12.0908 16.4545C13.2481 16.4545 14.358 15.9947 15.1764 15.1764C15.9947 14.358 16.4545 13.2481 16.4545 12.0908C16.4545 10.9335 15.9947 9.8236 15.1764 9.00526C14.358 8.18692 13.2481 7.72718 12.0908 7.72718C10.9335 7.72718 9.8236 8.18692 9.00526 9.00526C8.18692 9.8236 7.72718 10.9335 7.72718 12.0908C7.72718 13.2481 8.18692 14.358 9.00526 15.1764C9.8236 15.9947 10.9335 16.4545 12.0908 16.4545ZM10.9999 0.0908203H13.1817V3.36355H10.9999V0.0908203ZM10.9999 20.8181H13.1817V24.0908H10.9999V20.8181ZM2.83446 4.377L4.377 2.83446L6.69082 5.14828L5.14828 6.69082L2.83446 4.37809V4.377ZM17.4908 19.0334L19.0334 17.4908L21.3472 19.8046L19.8046 21.3472L17.4908 19.0334ZM19.8046 2.83337L21.3472 4.377L19.0334 6.69082L17.4908 5.14828L19.8046 2.83446V2.83337ZM5.14828 17.4908L6.69082 19.0334L4.377 21.3472L2.83446 19.8046L5.14828 17.4908ZM24.0908 10.9999V13.1817H20.8181V10.9999H24.0908ZM3.36355 10.9999V13.1817H0.0908203V10.9999H3.36355Z" fill="" />
+              </svg>
+              <img class="xc nm" src="{% static 'base_tailwind/images/icon-moon.svg' %}" alt="Moon" />
+            </label>
+          </div>
+
+          {% if user.is_authenticated %}
+            <span class="ek pk xl">{{ user.username }}</span>
+            <form method="post" action="{% url 'Gestion_Projects:logout' %}" class="sc">
+              {% csrf_token %}
+              <button type="submit" class="ek rg lk ml il gi hi" :class="{ 'hh/[0.15]' : page === 'home', 'sh' : page === 'home' && stickyMenu }">
+                Déconnexion
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="ek pk xl">Sign In</a>
+            <a href="#" class="lk gh dk rg tc wf xf _l gi hi" :class="{ 'hh/[0.15]' : page === 'home', 'sh' : page === 'home' && stickyMenu }">Sign Up</a>
+          {% endif %}
         </div>
-    </header>
-
-    <!-- Main Content -->
-    {% block main_content %}
-    <main class="{% block main_classes %}max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6{% endblock main_classes %}">
-        {% if messages %}
-        <div class="mb-6 space-y-2">
-            {% for message in messages %}
-            <div class="p-4 rounded-xl {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200
-                       {% elif message.tags == 'error' %}bg-red-100 text-red-700 border border-red-200
-                       {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-700 border border-yellow-200
-                       {% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% block content %}{% endblock content %}
-    </main>
-    {% endblock main_content %}
-
-    <!-- Floating action button (nouveau projet) -->
-    <a href="{% url 'Gestion_Projects:project_create' %}" data-onboard="true" data-onboard-order="3" data-onboard-text="Créez un nouveau projet rapidement depuis ce bouton." class="fab" title="Nouveau projet">+
-        <span class="sr-only">Nouveau projet</span>
-    </a>
-
-    <!-- Toast -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 p-3 rounded-xl bg-slate-900 text-white shadow-lg text-sm">
-        Action effectuée
+      </div>
     </div>
+  </header>
+  <!-- ===== Header End ===== -->
 
-    <!-- Onboarding overlay + tooltip (injected once) -->
-    <div id="onboardOverlay" class="onboard-overlay" aria-hidden="true"></div>
-    <div id="onboardTip" class="onboard-tip" role="dialog" aria-modal="true" style="display:none">
-        <div id="onboardTipText"></div>
-        <div class="actions">
-            <button id="onboardSkip">Passer</button>
-            <button id="onboardNext" class="primary">Suivant</button>
+  <main>
+    {% if messages %}
+    <div class="bb ze ki xn 2xl:ud-px-0 kb">
+      {% for message in messages %}
+      <div class="sg vk xm yh ac {% if message.tags == 'success' %}gh{% elif message.tags == 'error' %}kh{% elif message.tags == 'warning' %}oh{% else %}jh{% endif %}">
+        <div class="tc wf ag">
+          <span class="ek lk">{{ message }}</span>
         </div>
+      </div>
+      {% endfor %}
     </div>
+    {% endif %}
 
-    <!-- Footer: Chatbot (coming soon) -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="p-4 rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4 card-accent">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-brand-500 to-indigo-600 rounded-full shadow-sm robot-badge">
-                    <!-- simple robot SVG icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="robot-svg">
-                        <rect x="3" y="7" width="18" height="10" rx="2" />
-                        <path d="M7 7V5a3 3 0 0 1 6 0v2" />
-                        <path d="M9 12h.01M15 12h.01" />
-                        <path d="M9 17v1a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="text-sm font-semibold text-brand-900 dark:text-slate-100">Assistant Chatbot — bientôt</div>
-                    <div class="text-xs opacity-70">Un assistant IA pour vous aider à planifier vos révisions et tâches.</div>
-                </div>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+          <div class="animate_top zd/2 to/4">
+            <a href="{% url 'home' %}">
+              <img src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo" class="om" />
+              <img src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo" class="xc nm" />
+            </a>
+            <p class="lc fb">Personal Study & Project Tracker</p>
+          </div>
+
+          <div class="vd ro tc sf rn un gg vn">
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Quick Links</h4>
+              <ul>
+                <li><a href="{% url 'home' %}" class="sc xl vb">Home</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'Gestion_Projects:project_list' %}" class="sc xl vb">Projects</a></li>
+                {% endif %}
+              </ul>
             </div>
-            <div class="flex items-center gap-2">
-                <a href="#" class="btn-ghost" aria-disabled="true">En savoir plus</a>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Support</h4>
+              <ul>
+                <li><a href="#support" class="sc xl vb">Contact Us</a></li>
+              </ul>
             </div>
+          </div>
         </div>
-    </footer>
+      </div>
 
-    <!-- Scripts communs -->
-    <script>
-        // Thème sombre/clair
-        const themeToggle = document.getElementById('themeToggle');
-        const root = document.documentElement;
-        const pref = localStorage.getItem('pt-theme');
-        if (pref === 'dark' || (!pref && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-        themeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('pt-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        });
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <p>&copy; 2025 Personal Tracker. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
 
-        // Initialisation des icônes
-        lucide.createIcons();
+  <!-- ====== Back To Top Start ===== -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a" @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+    @scroll.window="scrollTop = (window.pageYOffset > 50) ? true : false" :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
 
-        // Animate progress bars (look for elements with .progress-bar and data-progress)
-        document.addEventListener('DOMContentLoaded', function(){
-            document.querySelectorAll('.progress-bar').forEach(function(el){
-                const target = el.dataset.progress || el.getAttribute('data-progress') || el.getAttribute('aria-valuenow');
-                const pct = Math.max(0, Math.min(100, parseFloat(target || 0)));
-                // small timeout to allow paint
-                setTimeout(() => { el.style.width = pct + '%'; }, 120);
-            });
-
-            // Count-up elements: animate numbers from 0 to data-target
-            document.querySelectorAll('[data-count-target]').forEach(function(el){
-                const target = parseInt(el.dataset.countTarget || '0', 10);
-                let current = 0;
-                const step = Math.max(1, Math.round(target / 40));
-                const id = setInterval(()=>{
-                    current += step;
-                    if(current >= target){ current = target; el.textContent = target; clearInterval(id); }
-                    else { el.textContent = current; }
-                }, 18);
-            });
-        });
-
-        // Simple onboarding tour (shows once)
-        (function(){
-            const seen = localStorage.getItem('pt-onboard-seen');
-            if(seen) return; // already shown
-
-            // Collect nodes with data-onboard and sort by order
-            const nodes = Array.from(document.querySelectorAll('[data-onboard]'))
-                .map(n => ({ el: n, order: parseInt(n.dataset.onboardOrder||'999',10), text: n.dataset.onboardText||'' }))
-                .sort((a,b)=>a.order - b.order);
-            if(!nodes.length) return;
-
-            const overlay = document.getElementById('onboardOverlay');
-            const tip = document.getElementById('onboardTip');
-            const tipText = document.getElementById('onboardTipText');
-            const btnNext = document.getElementById('onboardNext');
-            const btnSkip = document.getElementById('onboardSkip');
-
-            let idx = 0;
-
-            function showIndex(i){
-                const node = nodes[i];
-                if(!node) return finish();
-                const rect = node.el.getBoundingClientRect();
-                tipText.textContent = node.text || 'Astuce';
-                // Position tip above element if enough space else below
-                const topAbove = rect.top - 16 - tip.offsetHeight;
-                let top = Math.max(16, rect.top + window.scrollY - tip.offsetHeight - 12);
-                if(top < 8) top = rect.bottom + window.scrollY + 12; // position below
-                const left = Math.max(12, rect.left + window.scrollX + (rect.width/2) - (tip.offsetWidth/2));
-                // show overlay + tip
-                overlay.style.display = 'block';
-                tip.style.display = 'block';
-                // small timeout to ensure offsetWidth/Height are available
-                setTimeout(()=>{
-                    tip.style.top = (top) + 'px';
-                    tip.style.left = (left) + 'px';
-                }, 10);
-            }
-
-            function next(){ idx++; if(idx >= nodes.length) finish(); else showIndex(idx); }
-            function finish(){ overlay.style.display='none'; tip.style.display='none'; localStorage.setItem('pt-onboard-seen','1'); }
-
-            // wire buttons
-            btnNext.addEventListener('click', ()=> next());
-            btnSkip.addEventListener('click', ()=> finish());
-
-            // start after short delay so elements render
-            setTimeout(()=> showIndex(0), 350);
-        })();
-
-        // Toast helper
-        function toast(msg){ 
-            const t = document.getElementById('toast'); 
-            t.textContent = msg; 
-            t.classList.remove('hidden'); 
-            setTimeout(() => t.classList.add('hidden'), 2000); 
-        }
-    </script>
-
-    {% block extra_scripts %}{% endblock extra_scripts %}
-    <script src="{% static 'base_tailwind/bundle.js' %}"></script>
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>

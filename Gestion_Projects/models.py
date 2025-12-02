@@ -1,5 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django.conf import settings  
+from django.contrib.auth.models import User
+from datetime import date
+from django.db import models
 from django.utils import timezone
 
 class Project(models.Model):
@@ -10,7 +14,6 @@ class Project(models.Model):
         ('on_hold', 'En pause'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, verbose_name="Titre")
     description = models.TextField(blank=True, verbose_name="Description")
     deadline = models.DateField(verbose_name="Date limite")
@@ -35,6 +38,9 @@ class Project(models.Model):
     @property
     def is_overdue(self):
         return self.deadline < timezone.now().date() and self.status != 'completed'
+    @property
+    def is_overdue(self):
+        return date.today() > self.deadline
     
     @property
     def days_remaining(self):
@@ -68,3 +74,13 @@ class Task(models.Model):
     
     def __str__(self):
         return self.title
+    
+    
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.message[:30]}"
