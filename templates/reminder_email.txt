@@ -1,0 +1,14 @@
+Hello,
+
+A new reunion has been created.
+
+Title: {{ reunion.title }}
+Date:  {{ reunion.date }}
+Start: {{ reunion.start_time }}
+End:   {{ reunion.end_time }}
+
+Description:
+{{ reunion.description }}
+
+Regards,
+{{ site_name }}

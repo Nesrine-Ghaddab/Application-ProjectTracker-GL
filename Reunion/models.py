@@ -2,6 +2,16 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 from datetime import datetime, timedelta
+from django.conf import settings
+
+organizer = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+    related_name='organized_reunions',
+    help_text="User who organized this meeting"
+)
 
 class Reunion(models.Model):
     # Reunion type choices
@@ -95,6 +105,22 @@ class Reunion(models.Model):
         # Send when reminder time has passed, and up to 5 minutes after start
         window_end = self.datetime + timedelta(minutes=5)
         return reminder_time <= now <= window_end
+    
+    def clean(self):
+        """Validate the reunion data"""
+        from django.core.exceptions import ValidationError
+        
+        # Check if start date is in the past
+        if self.date < timezone.now().date():
+            raise ValidationError({'date': 'The meeting date cannot be in the past.'})
+        
+        # Check if it's today and start time is in the past
+        if self.date == timezone.now().date() and self.start_time < timezone.now().time():
+            raise ValidationError({'start_time': 'The meeting start time cannot be in the past.'})
+        
+        # Check if start time is after end time
+        if self.start_time >= self.end_time:
+            raise ValidationError({'end_time': 'The end time must be after the start time.'})
     
     class Meta:
         ordering = ['-date', '-start_time']

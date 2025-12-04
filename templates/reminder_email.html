@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <body>
+    <p>Hello,</p>
+    <p>A new reunion has been created:</p>
+    <ul>
+      <li><strong>Title:</strong> {{ reunion.title }}</li>
+      <li><strong>Date:</strong> {{ reunion.date }}</li>
+      <li><strong>Start:</strong> {{ reunion.start_time }}</li>
+      <li><strong>End:</strong> {{ reunion.end_time }}</li>
+    </ul>
+    <p>{{ reunion.description|linebreaks }}</p>
+    <p>Best,<br>{{ site_name }}</p>
+  </body>
+</html>

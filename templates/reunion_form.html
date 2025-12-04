@@ -233,12 +233,154 @@
 
                 <!-- Form Actions -->
                 <div class="tc wf cg ap nb">
-                  <button type="submit" class="lk gh dk rg tc wf xf _l gi hi">
+                  <button type="submit" class="lk gh dk rg tc wf xf _l gi hi" id="submitBtn">
                     {% if reunion %}Update Meeting{% else %}Schedule Meeting{% endif %}
                   </button>
                   <a href="{% url 'reunion_list' %}" class="ek pk xl rg gi hi">Cancel</a>
                 </div>
+
+                <!-- Error messages display -->
+                {% if form.non_field_errors %}
+                  <div class="mt-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300">
+                    <h3 class="font-bold mb-2">Please fix the following errors:</h3>
+                    {% for error in form.non_field_errors %}
+                      <p>• {{ error }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if form.date.errors %}
+                  <div class="mt-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300">
+                    <h3 class="font-bold mb-2">Date Error:</h3>
+                    {% for error in form.date.errors %}
+                      <p>• {{ error }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if form.start_time.errors %}
+                  <div class="mt-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300">
+                    <h3 class="font-bold mb-2">Start Time Error:</h3>
+                    {% for error in form.start_time.errors %}
+                      <p>• {{ error }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                {% if form.end_time.errors %}
+                  <div class="mt-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300">
+                    <h3 class="font-bold mb-2">End Time Error:</h3>
+                    {% for error in form.end_time.errors %}
+                      <p>• {{ error }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </form>
+
+              <!-- Client-side validation script -->
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  const form = document.querySelector('form');
+                  const dateInput = document.getElementById('date');
+                  const startTimeInput = document.getElementById('start_time');
+                  const endTimeInput = document.getElementById('end_time');
+                  const submitBtn = document.getElementById('submitBtn');
+
+                  // Get today's date in YYYY-MM-DD format
+                  const today = new Date();
+                  const todayString = today.toISOString().split('T')[0];
+
+                  // Set minimum date to today
+                  dateInput.setAttribute('min', todayString);
+
+                  // Get current time in HH:mm format
+                  function getCurrentTime() {
+                    const now = new Date();
+                    return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                  }
+
+                  // Real-time validation
+                  function validateForm() {
+                    const date = dateInput.value;
+                    const startTime = startTimeInput.value;
+                    const endTime = endTimeInput.value;
+                    let isValid = true;
+                    let errors = [];
+
+                    // Check if date is in the past
+                    if (date && date < todayString) {
+                      errors.push('❌ Meeting date cannot be in the past.');
+                      dateInput.style.borderColor = '#ef4444';
+                      isValid = false;
+                    } else if (dateInput.value) {
+                      dateInput.style.borderColor = '#10b981';
+                    }
+
+                    // Check if today's date and time is in the past
+                    if (date === todayString && startTime) {
+                      const currentTime = getCurrentTime();
+                      if (startTime < currentTime) {
+                        errors.push('❌ Meeting start time cannot be in the past (Current time: ' + currentTime + ')');
+                        startTimeInput.style.borderColor = '#ef4444';
+                        isValid = false;
+                      } else {
+                        startTimeInput.style.borderColor = '#10b981';
+                      }
+                    } else if (startTime) {
+                      startTimeInput.style.borderColor = '#10b981';
+                    }
+
+                    // Check if start time is after end time
+                    if (startTime && endTime && startTime >= endTime) {
+                      errors.push('❌ End time must be after start time.');
+                      endTimeInput.style.borderColor = '#ef4444';
+                      startTimeInput.style.borderColor = '#ef4444';
+                      isValid = false;
+                    } else if (startTime && endTime) {
+                      endTimeInput.style.borderColor = '#10b981';
+                    }
+
+                    // Display or clear error messages
+                    let errorContainer = document.getElementById('clientErrors');
+                    if (errors.length > 0) {
+                      if (!errorContainer) {
+                        errorContainer = document.createElement('div');
+                        errorContainer.id = 'clientErrors';
+                        errorContainer.className = 'mt-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-300';
+                        form.parentElement.insertBefore(errorContainer, form.nextSibling);
+                      }
+                      errorContainer.innerHTML = '<h3 class="font-bold mb-2">⚠️ Validation Errors:</h3>' + 
+                        errors.map(err => '<p>' + err + '</p>').join('');
+                      errorContainer.style.display = 'block';
+                    } else {
+                      if (errorContainer) {
+                        errorContainer.style.display = 'none';
+                      }
+                    }
+
+                    submitBtn.disabled = !isValid;
+                    submitBtn.style.opacity = isValid ? '1' : '0.5';
+                    submitBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+
+                    return isValid;
+                  }
+
+                  // Add event listeners for real-time validation
+                  dateInput.addEventListener('change', validateForm);
+                  startTimeInput.addEventListener('change', validateForm);
+                  endTimeInput.addEventListener('change', validateForm);
+
+                  // Validate on form submission
+                  form.addEventListener('submit', function(e) {
+                    if (!validateForm()) {
+                      e.preventDefault();
+                    }
+                  });
+
+                  // Initial validation
+                  validateForm();
+                });
+              </script>
             </div>
           </div>
         </div>
