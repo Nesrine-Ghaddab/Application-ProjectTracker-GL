@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog Grids | Base - Tailwind CSS Startup Template</title>
   <link rel="icon" href="favicon.ico">
-  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <link href="{% static 'css/Notes_style.css' %}" rel="stylesheet">
 </head>
 
 <body x-data="{ page: 'blog-grid', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
@@ -21,7 +21,7 @@
     @scroll.window="stickyMenu = (window.pageYOffset > 20) ? true : false">
     <div class="bb ze ki xn 2xl:ud-px-0 oo wf yf i">
       <div class="vd to/4 tc wf yf">
-        <a href="index.html">
+        <a href="{% url 'home' %}">
           <img class="om" src="{% static 'images/logo-light.svg' %}" alt="Logo Light" />
           <img class="xc nm" src="{% static 'images/logo-dark.svg' %}" alt="Logo Dark" />
         </a>
@@ -45,9 +45,9 @@
 
       <div class="vd wo/4 sd qo f ho oo wf yf" :class="{ 'd hh rm sr td ud qg ug jc yh': navigationOpen }">
         <nav>
-          <ul class="tc _o sf yo cg ep">
-            <li><a href="index.html" class="xl" :class="{ 'mk': page === 'home' }">Dashboard</a></li>
-            <li class="c i" x-data="{ dropdown: false }">
+          <ul class="tc _o sf yo cg ep" style="list-style-type: none">
+            <li><a href="index.html" class="xl" :class="{ 'mk': page === 'home' }" style="list-style-type: none">Dashboard</a></li>
+            <li class="c i" x-data="{ dropdown: false }" style="list-style-type: none">
               <a href="#!" class="xl tc wf yf bg" @click.prevent="dropdown = !dropdown"
                 :class="{ 'mk': page === 'blog-grid' || page === 'blog-single' || page === 'signin' || page === 'signup' || page === '404' }">
                 Pages
@@ -60,7 +60,7 @@
               </a>
 
               <!-- Dropdown Start -->
-              <ul class="a" :class="{ 'tc': dropdown }">
+              <ul class="a" :class="{ 'tc': dropdown }" style="list-style-type: none">
                 <li><a href="sessions.html" class="xl" :class="{ 'mk': page === 'blog-grid' }">Sessions</a></li>
                 <li><a href="projects.html" class="xl" :class="{ 'mk': page === 'blog-single' }">Projects & tasks</a></li>
                 <li><a href="agenda.html" class="xl" :class="{ 'mk': page === 'signin' }">Agenda</a></li>
