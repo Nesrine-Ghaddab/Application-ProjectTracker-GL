@@ -15,7 +15,7 @@
   x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
          $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
-  :class="{'b eh': darkMode === true}">
+  :class="{'b eh dark': darkMode === true}">
   <!-- ===== Header Start ===== -->
   <header class="g s r vd ya cj" :class="{ 'hh sm _k dj bl ll' : stickyMenu }"
     @scroll.window="stickyMenu = (window.pageYOffset > 20) ? true : false">
@@ -128,10 +128,10 @@
 
           <!-- Contenu -->
           <article class="ek tj ml il kk wm xl eq lb mb-8" style="font-size: 120%; font-weight: normal; overflow:auto;">
-            <p class="text-sm opacity-90 whitespace-pre-wrap break-words leading-relaxed" 
+            <!-- <p class="text-sm opacity-90 whitespace-pre-wrap break-words leading-relaxed" 
               style="word-break: break-word; overflow-wrap: anywhere;">
-              {{ note.content }}
-            </p>
+            </p> -->
+            {{ note.content_html|safe }}
           </article><br>
 
           <!-- Tags liés à la note -->

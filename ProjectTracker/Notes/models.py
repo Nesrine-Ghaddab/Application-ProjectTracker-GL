@@ -1,4 +1,5 @@
 from django.db import models
+import markdown, bleach
 
 class Tag(models.Model):
 	name = models.CharField(max_length=30, unique=True, null=False, blank=False)
@@ -15,3 +16,8 @@ class Note(models.Model):
 
 	def __str__(self):
 		return self.title
+	
+	def content_html(self):
+		raw_html = markdown.markdown(self.content, extensions=["fenced_code", "tables"])
+		clean_html = bleach.clean(raw_html, tags=["p", "strong", "em", "blockquote", "b", "i", "ul", "li", "a", "code", "pre", "h1", "h2", "h3", "hr", "code"])
+		return clean_html
