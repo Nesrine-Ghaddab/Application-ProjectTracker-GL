@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Personal Tracker{% endblock %}
+
+{% block content %}
+<!-- ===== Contact/Form Start ===== -->
+<section class="i pg fh rm ji gp uq">
+  <!-- Bg Shapes -->
+  <img src="{% static 'base_tailwind/images/shape-06.svg' %}" alt="Shape" class="h aa y" />
+  <img src="{% static 'base_tailwind/images/shape-03.svg' %}" alt="Shape" class="h ca u" />
+  <img src="{% static 'base_tailwind/images/shape-07.svg' %}" alt="Shape" class="h w da ee" />
+
+  <!-- Section Title Start -->
+  <div class="animate_top bb ze rj ki xn vq">
+    <h2 class="fk vj pr kk wm on/5 gq/2 bb _b">{{ title }}</h2>
+    <p class="bb on/5 wo/5 hq">Remplissez les informations ci-dessous pour gérer votre projet.</p>
+  </div>
+  <!-- Section Title End -->
+
+  <div class="i va bb ye ki xn wq jb mo">
+    <div class="animate_top w-full nn/5 vo/3 bb vk sg hh sm yh tq">
+      <form method="post">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="fb">
+          <label class="rc ac ek kk" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}
+            <span class="kh">*</span>
+            {% endif %}
+          </label>
+          
+          {% if field.field.widget.input_type == 'textarea' %}
+            <textarea 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}"
+              class="vd ph sg zk xm _g ch pm hm dm dn em pl/50 ci"
+              rows="4">{{ field.value|default:'' }}</textarea>
+          {% elif field.field.widget.input_type == 'select' %}
+            <select 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              class="vd ph sg zk xm _g ch pm hm dm dn em pl/50 xi mi">
+              {% for value, label in field.field.choices %}
+              <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          {% else %}
+            <input 
+              type="{{ field.field.widget.input_type|default:'text' }}" 
+              name="{{ field.name }}" 
+              id="{{ field.id_for_label }}"
+              value="{{ field.value|default:'' }}"
+              placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}"
+              class="vd ph sg zk xm _g ch pm hm dm dn em pl/50 xi mi" />
+          {% endif %}
+          
+          {% if field.errors %}
+          <div class="kh uj ac">
+            {% for error in field.errors %}
+            {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          {% if field.help_text %}
+          <p class="pk uj ac">{{ field.help_text }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="tc xf gap-3">
+          <button type="submit" class="vc rg lk gh ml il hi gi _l">
+            <svg class="uh ub" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Enregistrer
+          </button>
+          <a href="{% if project %}{% url 'projects:project_detail' project.pk %}{% else %}{% url 'projects:home' %}{% endif %}" 
+             class="vc rg ml il hi gi ph xl _g ch">
+            Annuler
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+<!-- ===== Contact/Form End ===== -->
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Form validation and enhancement
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    
+    // Add focus effects
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.classList.add('ring-2', 'ring-blue-500');
+      });
+      
+      input.addEventListener('blur', function() {
+        this.classList.remove('ring-2', 'ring-blue-500');
+      });
+    });
+  });
+</script>
+{% endblock %}

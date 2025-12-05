@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete Meeting | Personal Meeting Tracker</title>
+  {% load static %}
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link href="{% static 'base_tailwind/style.css' %}" rel="stylesheet">
+</head>
+
+<body
+  x-data="{ page: 'meetings', darkMode: true, stickyMenu: false, navigationOpen: false, scrollTop: false }"
+  x-init="
+    darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? true;
+    $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))
+  "
+  :class="{ 'b eh': darkMode === true }">
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+  <!-- ===== Header End ===== -->
+
+  <main>
+    <!-- ===== Delete Confirmation Start ===== -->
+    <section class="gj qp gr hj rp hr">
+      <div class="bb ze ki xn 2xl:ud-px-0">
+        <div class="tc sf yo zf kq">
+          <div class="ro">
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-10 text-center">
+
+              <!-- Warning Icon -->
+              <div class="tc wf cg ap qb">
+                <div class="tc wf xf ie ld vg sr mh tr g">
+                  <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Title & message -->
+              <h1 class="ek vj 2xl:ud-text-title-lg kk wm nb gb">Delete Meeting</h1>
+              <div class="tc wf cg ap qb">
+                <p class="wj kk wm">Are you sure you want to delete this meeting?</p>
+                <p class="sc">This action cannot be undone.</p>
+              </div>
+
+              <!-- Meeting Details -->
+              <div class="tc wf cg ap qb pn dg cb rounded-md border border-stroke dark:border-strokedark p-6">
+                <h3 class="wj kk wm xl">{{ reunion.title }}</h3>
+                <div class="tc wf sf rn un gg">
+                  <div class="tc wf">
+                    <p class="sc"><strong>Date:</strong> {{ reunion.date }}</p>
+                    <p class="sc"><strong>Time:</strong> {{ reunion.start_time }} - {{ reunion.end_time }}</p>
+                  </div>
+                  <div class="tc wf">
+                    <p class="sc"><strong>Type:</strong> {{ reunion.get_reunion_type_display }}</p>
+                    <p class="sc"><strong>Subject:</strong> {{ reunion.get_subject_display }}</p>
+                  </div>
+                </div>
+                {% if reunion.description %}
+                  <p class="sc mt-3"><strong>Description:</strong> {{ reunion.description }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Delete Form -->
+              <form method="post" class="tc wf cg ap">
+                {% csrf_token %}
+                <div class="tc wf cg">
+                  <button type="submit" class="lk kh dk rg tc wf xf _l gi hi">
+                    Yes, Delete Meeting
+                  </button>
+                  <a href="{% url 'reunion:list' %}" class="ek pk xl rg gi hi">
+                    Cancel
+                  </a>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ===== Delete Confirmation End ===== -->
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <!-- Footer Top -->
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+          <div class="animate_top zd/2 to/4">
+            <a href="{% url 'reunion:list' %}">
+              <img src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo" class="om" />
+              <img src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo" class="xc nm" />
+            </a>
+            <p class="lc fb">Streamline your workflow with our productivity tools.</p>
+            <ul class="tc wf cg">
+              <li><a href="#!">Facebook</a></li>
+              <li><a href="#!">Twitter</a></li>
+              <li><a href="#!">LinkedIn</a></li>
+            </ul>
+          </div>
+
+          <div class="vd ro tc sf rn un gg vn">
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Quick Links</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Home</a></li>
+                <li><a href="#!" class="sc xl vb">Product</a></li>
+                <li><a href="#!" class="sc xl vb">Careers</a></li>
+                <li><a href="#!" class="sc xl vb">Pricing</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Services</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Web Development</a></li>
+                <li><a href="#!" class="sc xl vb">Graphics Design</a></li>
+                <li><a href="#!" class="sc xl vb">Digital Marketing</a></li>
+                <li><a href="#!" class="sc xl vb">Ui/Ux Design</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Support</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Company</a></li>
+                <li><a href="#!" class="sc xl vb">Press media</a></li>
+                <li><a href="#!" class="sc xl vb">Our Blog</a></li>
+                <li><a href="#!" class="sc xl vb">Contact Us</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Newsletter</h4>
+              <p class="ac qe">Subscribe to receive future updates</p>
+              <form action="https://formbold.com/s/unique_form_id" method="POST">
+                <div class="i">
+                  <input type="text" placeholder="Email address" class="vd sm _g ch pm vk xm rg gm dm dn gi mi" />
+                  <button class="h q fi">Subscribe</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <ul class="tc wf gg">
+            <li><a href="#!" class="xl">English</a></li>
+            <li><a href="#!" class="xl">Privacy Policy</a></li>
+            <li><a href="#!" class="xl">Support</a></li>
+          </ul>
+        </div>
+        <div class="animate_top">
+          <p>&copy; 2025 Personal Meeting Tracker. All rights reserved.</p>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
+
+  <!-- ====== Back To Top Start ===== -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a"
+          @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+          @scroll.window="scrollTop = (window.pageYOffset > 50)"
+          :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path
+        d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+  <!-- ====== Back To Top End ===== -->
+
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+</body>
+</html>

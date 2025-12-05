@@ -1,0 +1,226 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In | Base - Tailwind CSS Startup Template</title>
+
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link href="{% static 'base_tailwind/style.css' %}" rel="stylesheet">
+</head>
+
+<body x-data="{ page: 'signin', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="
+         darkMode = JSON.parse(localStorage.getItem('darkMode'));
+         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+
+
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+
+  <!-- ===== Header End ===== -->
+
+
+
+  <main>
+    <!-- ===== SignIn Form Start ===== -->
+    <section class="i pg fh rm ki xn vq gj qp gr hj rp hr">
+
+      <!-- Background Shapes -->
+      <img src="{% static 'base_tailwind/shape-06.svg' %}" alt="Shape" class="h j k" />
+      <img src="{% static 'base_tailwind/images/shape-03.svg' %}" alt="Shape" class="h l m" />
+      <img src="{% static 'base_tailwind/images/shape-17.svg' %}" alt="Shape" class="h n o" />
+      <img src="{% static 'base_tailwind/images/shape-18.svg' %}" alt="Shape" class="h p q" />
+
+      <div class="animate_top bb af i va sg hh sm vk xm yi _n jp hi ao kp">
+
+        <!-- TITLE -->
+        <div class="rj">
+          <h2 class="ek ck kk wm xb">Sign in to your Account</h2>
+          <p class="text-gray-400">Enter your credentials to continue</p>
+        </div>
+
+
+        <!-- ===== Django Messages ===== -->
+        {% if messages %}
+          {% for message in messages %}
+            <p class="text-red-500 text-center my-2">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+
+
+
+        <!-- ====== LOGIN FORM (Django) ====== -->
+        <form class="sb" method="POST">
+          {% csrf_token %}
+          <!-- EMAIL -->
+          <div class="wb">
+            <label class="rc kk wm vb" for="username">Email</label>
+            <input 
+              type="email"
+              name="username"
+              value="{{ form.username.value }}"
+              placeholder="example@gmail.com"
+              class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"
+            />
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="wb">
+            <label class="rc kk wm vb" for="password">Password</label>
+            <input 
+              type="password"
+              name="password"
+              placeholder="***************"
+              class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"
+            />
+          </div>
+
+          <div class="wb">
+            <label class="rc kk wm vb" for="password">Please enter the letters below :</label>
+    {{ form.captcha }}
+    
+    {% if form.captcha.errors %}
+        <p class="text-red-500 text-sm mt-1">{{ form.captcha.errors.0 }}</p>
+    {% endif %}
+</div>
+
+
+          <!-- SUBMIT BUTTON -->
+          <button class="vd rj ek rc rg gh lk ml il _l gi hi">
+            Sign In
+          </button>
+
+          <!-- Link to REGISTER -->
+          <p class="sj hk xj rj ob">
+            Don't have an account?
+            <a class="mk" href="{% url 'register' %}"> Sign Up </a>
+          </p>
+
+          <p class="sj hk xj rj ob">
+            Forgot ypur password?
+            <a class="mk" href="{% url 'password_reset' %}"> Reset Password </a>
+          </p>
+
+        </form>
+      </div>
+
+
+    </section>
+    <!-- ===== SignIn Form End ===== -->
+  </main>
+
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+
+      <!-- Footer Top -->
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+
+          <div class="animate_top zd/2 to/4">
+            <a href="/">
+              <img src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo" class="om" />
+              <img src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo" class="xc nm" />
+            </a>
+
+            <p class="lc fb">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          </div>
+
+          <!-- Social Icons -->
+          <ul class="tc wf cg">
+            <li>
+              <a href="#!"><img class="vh ul cl il" src="{% static 'base_tailwind/images/facebook.svg' %}"></a>
+            </li>
+            <li>
+              <a href="#!"><img class="vh ul cl il" src="{% static 'base_tailwind/images/twitter.svg' %}"></a>
+            </li>
+            <li>
+              <a href="#!"><img class="vh ul cl il" src="{% static 'base_tailwind/images/instagram.svg' %}"></a>
+            </li>
+            <li>
+              <a href="#!"><img class="vh ul cl il" src="{% static 'base_tailwind/images/linkedin.svg' %}"></a>
+            </li>
+          </ul>
+
+          <!-- Footer Links -->
+          <div class="vd ro tc sf rn un gg vn">
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Quick Links</h4>
+              <ul>
+                <li><a href="/" class="sc xl vb">Home</a></li>
+                <li><a href="#!" class="sc xl vb">Product</a></li>
+                <li><a href="#!" class="sc xl vb">Careers</a></li>
+                <li><a href="#!" class="sc xl vb">Pricing</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Services</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Web Development</a></li>
+                <li><a href="#!" class="sc xl vb">Graphics Design</a></li>
+                <li><a href="#!" class="sc xl vb">Marketing</a></li>
+                <li><a href="#!" class="sc xl vb">UI/UX</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Support</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Company</a></li>
+                <li><a href="#!" class="sc xl vb">Press</a></li>
+                <li><a href="#!" class="sc xl vb">Blog</a></li>
+                <li><a href="#!" class="sc xl vb">Contact</a></li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- Footer Top -->
+
+
+      <!-- Footer Bottom -->
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <ul class="tc wf gg">
+            <li><a href="#!" class="xl">English</a></li>
+            <li><a href="#!" class="xl">Privacy Policy</a></li>
+            <li><a href="#!" class="xl">Support</a></li>
+          </ul>
+        </div>
+
+        <div class="animate_top">
+          <p>&copy; 2025 Base. All rights reserved.</p>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
+
+
+  <!-- Back To Top -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a" 
+    @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+    @scroll.window="scrollTop = (window.pageYOffset > 50)">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+
+
+  <!-- JS -->
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+
+</body>
+</html>

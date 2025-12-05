@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
+</head>
+<body class="i pg ji gp uq">
+  <div class="bb ze ki xn vq jb jo">
+    <h1 class="fk vj kk wm mb-4">Connexion</h1>
+
+    <form method="post" class="vd sm _g ch pm vk xm rg gm dm dn gi mi">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="lk gh dk rg tc wf xf _l gi hi">
+            Se connecter
+        </button>
+    </form>
+  </div>
+</body>
+</html>

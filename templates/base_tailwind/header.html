@@ -1,0 +1,110 @@
+{% load static %}
+
+<header class="g s r vd ya cj"
+        x-data="{ stickyMenu:false, navigationOpen:false }"
+        :class="{ 'hh sm _k dj bl ll' : stickyMenu }"
+        @scroll.window="stickyMenu = (window.pageYOffset > 20)">
+
+  <div class="bb ze ki xn 2xl:ud-px-0 oo wf yf i">
+
+    <!-- Logo + Hamburger -->
+    <div class="vd to/4 tc wf yf">
+      <a href="{% url 'home' %}">
+        <img class="om" src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo Light">
+        <img class="xc nm" src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo Dark">
+      </a>
+
+      <!-- Hamburger Button -->
+      <button class="po rc" @click="navigationOpen = !navigationOpen">
+        <span class="rc i pf re pd">
+          <span class="du-block h q vd yc">
+            <span class="rc i r s eh um tg te rd eb ml jl dl"
+                  :class="{ 'ue el': !navigationOpen }"></span>
+            <span class="rc i r s eh um tg te rd eb ml jl fl"
+                  :class="{ 'ue qr': !navigationOpen }"></span>
+            <span class="rc i r s eh um tg te rd eb ml jl gl"
+                  :class="{ 'ue hl': !navigationOpen }"></span>
+          </span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <div class="vd wo/4 sd qo f ho oo wf yf"
+         :class="{ 'd hh rm sr td ud qg ug jc yh': navigationOpen }">
+
+      <nav>
+        <ul class="tc _o sf yo cg ep">
+          <li><a href="{% url 'home' %}" class="xl">Dashboard</a></li>
+
+          <li class="c i" x-data="{ dropdown:false }">
+            <a href="#!" class="xl tc wf yf bg"
+               @click.prevent="dropdown = !dropdown">
+              Pages
+              <svg :class="{ 'wh': dropdown }" class="th mm we fd pf" viewBox="0 0 512 512">
+                <path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192..." />
+              </svg>
+            </a>
+
+            <!-- Dropdown -->
+            <ul class="a" :class="{ 'tc': dropdown }">
+              <li><a href="{% url 'study:home' %}" class="xl">Sessions</a></li>
+              {% if user.is_authenticated %}
+                <li><a href="{% url 'projects:home' %}" class="xl">Projects</a></li>
+              {% else %}
+                <li><a href="{% url 'login' %}?next={% url 'projects:home' %}" class="xl">Projects</a></li>
+              {% endif %}
+              <li><a href="/agenda" class="xl">Agenda</a></li>
+              <li><a href="{% url 'reunion:list' %}"class="xl">Meetings</a></li>
+              <li><a href="/habits" class="xl">Habits & notes</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#support" class="xl">Support</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right section -->
+      <div class="tc wf ig pb no">
+
+        <!-- Dark Mode -->
+        <div class="pc h io pa ra">
+          <label class="rc ab i">
+            <input type="checkbox" @change="darkMode = !darkMode"
+                   class="pf vd yc uk h r za ab" />
+            <svg class="th om" width="25" height="25" viewBox="0 0 25 25">
+              <path d="M12.0908 18.6363C10.3549..." />
+            </svg>
+            <img class="xc nm" src="{% static 'base_tailwind/images/icon-moon.svg' %}" alt="Moon" />
+          </label>
+        </div>
+
+        {% if user.is_authenticated %}
+
+        <!-- USER MENU WHEN LOGGED IN -->
+        <div class="relative group ml-6">
+          <button class="flex items-center gap-2">
+            <span class="font-medium">{{ user.prenom }} {{ user.nom }}</span>
+            <img src="{{ user.phot.url }}" class="w-9 h-9 rounded-full object-cover" />
+          </button>
+
+          <div class="absolute hidden group-hover:block bg-white shadow-md rounded-md w-44 mt-2 right-0 p-2">
+            <a href="{% url 'profile' %}" class="block py-2 px-3 hover:bg-gray-100">My profile</a>
+            <a href="{% url 'logout' %}"
+               class="block py-2 px-3 hover:bg-gray-100 text-red-500">Logout</a>
+          </div>
+        </div>
+
+        {% else %}
+
+        <!-- IF NOT LOGGED IN -->
+        <a href="{% url 'login' %}" class="ek pk xl ml-6">Sign In</a>
+        <a href="{% url 'register' %}"
+           class="lk gh dk rg tc wf xf _l gi hi ml-2">Sign Up</a>
+
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</header>

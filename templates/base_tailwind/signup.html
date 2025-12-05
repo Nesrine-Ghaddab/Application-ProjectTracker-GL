@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | Base - Tailwind CSS Startup Template</title>
+
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link href="{% static 'base_tailwind/style.css' %}" rel="stylesheet">
+</head>
+
+<body x-data="{ page: 'signup', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="
+         darkMode = JSON.parse(localStorage.getItem('darkMode'));
+         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+
+
+  <!-- ===== Header End ===== -->
+
+  <main>
+    <!-- ===== SignUp Form Start ===== -->
+    <section class="i pg fh rm ki xn vq gj qp gr hj rp hr">
+
+      <!-- Background Shapes -->
+      <img src="{% static 'base_tailwind/images/shape-06.svg' %}" class="h j k">
+      <img src="{% static 'base_tailwind/images/shape-03.svg' %}" class="h l m">
+      <img src="{% static 'base_tailwind/images/shape-17.svg' %}" class="h n o">
+      <img src="{% static 'base_tailwind/images/shape-18.svg' %}" class="h p q">
+
+      <div class="animate_top bb af i va sg hh sm vk xm yi _n jp hi ao kp">
+
+        <span class="rc h r s zd/2 od zg gh"></span>
+        <span class="rc h r q zd/2 od xg mh"></span>
+
+        <div class="rj">
+          <h2 class="ek ck kk wm xb">Create an Account</h2>
+          <p>Please fill the form to register</p>
+
+          <!-- Messages Django -->
+          {% if messages %}
+            {% for message in messages %}
+              <p class="text-red-500 text-center my-2">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!-- FORM DJANGO -->
+        <form class="sb" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- NOM -->
+          <div class="wb">
+            <label class="rc kk wm vb">Nom</label>
+            <input type="text" name="nom" value="{{ form.nom.value }}" placeholder="Votre nom"
+              class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"/>
+          </div>
+
+          <!-- PRENOM -->
+          <div class="wb">
+            <label class="rc kk wm vb">Prénom</label>
+            <input type="text" name="prenom" value="{{ form.prenom.value }}" placeholder="Votre prénom"
+              class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"/>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="wb">
+            <label class="rc kk wm vb">Email</label>
+            <input type="email" name="email" value="{{ form.email.value }}" placeholder="example@gmail.com"
+              class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"/>
+          </div>
+
+          <!-- PASSWORD -->
+         <<div class="wb">
+    <label class="rc kk wm vb">Password</label>
+
+    <input type="password" name="password"
+           placeholder="***********"
+           class="password-input vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40">
+
+    <!-- Strength Meter -->
+    <div class="password-strength mt-3">
+        <div class="w-full bg-gray-200 rounded h-2 overflow-hidden">
+            <div class="strength-bar h-full w-0 transition-all duration-300"></div>
+        </div>
+        <p class="strength-label text-sm mt-1 text-gray-600"></p>
+    </div>
+</div>
+
+          <!-- PHOTO -->
+          <div class="wb">
+            <label class="rc kk wm vb">Photo de profil</label>
+            <input type="file" name="photo" class="vd hh rg zk _g ch hm dm fm xi mi sm xm pm dn/40"/>
+          </div>
+
+          <div class="wb">
+            <label class="rc kk wm vb" for="password">Please enter the letters below :</label>
+          {{ form.captcha }}
+          
+          {% if form.captcha.errors %}
+         <p class="text-red-500 text-sm mt-1">{{ form.captcha.errors.0 }}</p>
+         {% endif %}
+        </div>
+
+
+          <button class="vd rj ek rc rg gh lk ml il _l gi hi">Create Account</button>
+
+          <p class="sj hk xj rj ob">
+            Already have an account?
+            <a class="mk" href="{% url 'login' %}">Sign In</a>
+          </p>
+
+        </form>
+
+      </div>
+    </section>
+    <!-- ===== SignUp Form End ===== -->
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      ...
+      <!-- (I KEEP YOUR COMPLETE FOOTER — unchanged) -->
+      ...
+    </div>
+  </footer>
+
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a"
+    @click="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <svg class="uh se qd" viewBox="0 0 512 512">
+      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"/>
+    </svg>
+  </button>
+
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+  <script src="{% static 'base_tailwind/password_strength.js' %}"></script>
+  <script src="{% static 'base_tailwind/password_toggle.js' %}"></script>
+
+</body>
+</html>
+
+

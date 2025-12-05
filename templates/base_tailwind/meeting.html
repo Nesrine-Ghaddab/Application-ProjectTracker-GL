@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meetings | Personal Meeting Tracker</title>
+  {% load static %}
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link href="{% static 'base_tailwind/style.css' %}" rel="stylesheet">
+</head>
+
+<body
+  x-data="{ page: 'meetings', darkMode: true, stickyMenu: false, navigationOpen: false, scrollTop: false }"
+  x-init="
+    darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? true;
+    $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))
+  "
+  :class="{ 'b eh': darkMode === true }">
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+  <!-- ===== Header End ===== -->
+
+  <main>
+    <!-- ===== Meetings Start ===== -->
+    <section class="gj qp gr hj rp hr">
+      <div class="bb ze ki xn 2xl:ud-px-0">
+        <div class="tc sf yo zf kq">
+          <!-- main column -->
+          <div class="ro">
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-7.5 md:p-10">
+              <div class="tc wf yf ap">
+                <h1 class="ek vj 2xl:ud-text-title-lg kk wm nb gb">All Meetings</h1>
+                <a href="{% url 'reunion:create' %}" class="lk gh dk rg tc wf xf _l gi hi">
+                  Schedule New Meeting
+                </a>
+              </div>
+
+              <!-- Meetings Filter (static UI for now) -->
+              <div class="tc wf yf ap qb">
+                <div class="i">
+                  <form method="get" class="tc wf">
+                    <input type="text" name="search" placeholder="Search meetings..."
+                           value="{{ search_query }}"
+                           class="vd sm _g ch pm vk xm rg gm dm/40 dn/40 li mi" />
+                    <button type="submit" class="h r q _h">
+                      <svg class="th ul ml il" width="21" height="21" viewBox="0 0 21 21" fill="none"
+                           xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M16.031 14.617L20.314 18.899L18.899 20.314L14.617 16.031C13.0237 17.3082 11.042 18.0029 9 18C4.032 18 0 13.968 0 9C0 4.032 4.032 0 9 0C13.968 0 18 4.032 18 9C18.0029 11.042 17.3082 13.0237 16.031 14.617ZM14.025 13.875C15.2941 12.5699 16.0029 10.8204 16 9C16 5.132 12.867 2 9 2C5.132 2 2 5.132 2 9C2 12.867 5.132 16 9 16C10.8204 16.0029 12.5699 15.2941 13.875 14.025L14.025 13.875Z" />
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+
+                <div class="tc wf cg">
+                  <a href="{% url 'reunion:list' %}?filter=all" 
+                     class="{% if current_filter == 'all' or current_filter == '' %}lk gh dk rg tc wf xf _l gi hi{% else %}ek pk xl{% endif %}">
+                    All
+                  </a>
+                  <a href="{% url 'reunion:list' %}?filter=upcoming" 
+                     class="{% if current_filter == 'upcoming' %}lk gh dk rg tc wf xf _l gi hi{% else %}ek pk xl{% endif %}">
+                    Upcoming
+                  </a>
+                  <a href="{% url 'reunion:list' %}?filter=past" 
+                     class="{% if current_filter == 'past' %}lk gh dk rg tc wf xf _l gi hi{% else %}ek pk xl{% endif %}">
+                    Past
+                  </a>
+                </div>
+              </div>
+
+              <!-- Meetings List -->
+              <div class="qb">
+                {% for reunion in reunions %}
+                  <div class="tc wf ap qb pn cb rounded-md border border-stroke dark:border-strokedark bg-white dark:bg-blacksection shadow-solid-13">
+                    <!-- info column -->
+                    <div class="vd wo/5">
+                      <div class="tc wf yf ap">
+                        <h3 class="wj kk wm xl">{{ reunion.title }}</h3>
+
+                        <!-- Upcoming / Past chip -->
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                                     {% if reunion.is_upcoming %}
+                                       bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200
+                                     {% else %}
+                                       bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200
+                                     {% endif %}">
+                          {% if reunion.is_upcoming %}Upcoming{% else %}Past{% endif %}
+                        </span>
+                      </div>
+
+                      <!-- table-like text rows -->
+                      <div class="tc wf ap" style="row-gap: 0.15rem;">
+                        <p class="sc"><strong>Date:</strong> {{ reunion.date }}</p>
+                        <p class="sc"><strong>Time:</strong> {{ reunion.start_time }} – {{ reunion.end_time }}</p>
+                        <p class="sc"><strong>Type:</strong> {{ reunion.get_reunion_type_display }}</p>
+                        <p class="sc"><strong>Subject:</strong> {{ reunion.get_subject_display }}</p>
+
+                        <p class="sc">
+                          <strong>Reminder:</strong>
+                          {% if reunion.reminder_enabled %}
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+                                         {% if reunion.reminder_sent %}
+                                           bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200
+                                         {% elif reunion.needs_reminder %}
+                                           bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200
+                                         {% else %}
+                                           bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-200
+                                         {% endif %}">
+                              {{ reunion.get_reminder_timing_display }}
+                              {% if reunion.reminder_sent %}
+                                · sent
+                              {% elif reunion.needs_reminder %}
+                                · due now
+                              {% else %}
+                                · scheduled
+                              {% endif %}
+                            </span>
+                          {% else %}
+                            <span class="lk kh dk rg si ti">Disabled</span>
+                          {% endif %}
+                        </p>
+                      </div>
+
+                      {% if reunion.description %}
+                        <p class="sc mt-3"><strong>Description:</strong> {{ reunion.description }}</p>
+                      {% endif %}
+                    </div>
+
+                    <!-- actions column -->
+                    <div class="tc sf cg vn" style="gap: 0.5rem; align-items:flex-end;">
+                      <a href="{% url 'reunion:detail' reunion.pk %}" class="ek pk xl rg gi hi">
+                        View
+                      </a>
+                      <a href="{% url 'reunion:update' reunion.pk %}" class="lk oh dk rg gi hi">
+                        Edit
+                      </a>
+                      <a href="{% url 'reunion:delete' reunion.pk %}" class="lk kh dk rg gi hi">
+                        Delete
+                      </a>
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="tc wf cg ap qb pn dg cb rounded-md border border-stroke dark:border-strokedark p-5">
+                    <div class="tc">
+                      <h3 class="wj kk wm xl">No meetings scheduled yet.</h3>
+                      <p class="sc">Get started by scheduling your first meeting!</p>
+                      <a href="{% url 'reunion:create' %}"
+                         class="lk gh dk rg tc wf xf _l gi hi qb">
+                        Schedule Your First Meeting
+                      </a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="jn/2 so">
+            <!-- Search Widget -->
+            <div class="animate_top fb">
+              <form method="get" action="{% url 'reunion:list' %}">
+                <div class="i">
+                  <input type="text" name="search" placeholder="Search Here..."
+                         value="{{ search_query }}"
+                         class="vd sm _g ch pm vk xm rg gm dm/40 dn/40 li mi" />
+                  <button type="submit" class="h r q _h">
+                    <svg class="th ul ml il" width="21" height="21" viewBox="0 0 21 21" fill="none"
+                         xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M16.031 14.617L20.314 18.899L18.899 20.314L14.617 16.031C13.0237 17.3082 11.042 18.0029 9 18C4.032 18 0 13.968 0 9C0 4.032 4.032 0 9 0C13.968 0 18 4.032 18 9C18.0029 11.042 17.3082 13.0237 16.031 14.617ZM14.025 13.875C15.2941 12.5699 16.0029 10.8204 16 9C16 5.132 12.867 2 9 2C5.132 2 2 5.132 2 9C2 12.867 5.132 16 9 16C10.8204 16.0029 12.5699 15.2941 13.875 14.025L14.025 13.875Z" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Meeting Types Widget -->
+            <div class="animate_top fb">
+              <h4 class="tj kk wm qb">Meeting Types</h4>
+              <ul>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=education">Education Course</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=project">Project Meeting</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=revision">Revision Session</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=other">Other Meetings</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}">Show All Types</a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Upcoming Meetings -->
+            <div class="animate_top">
+              <h4 class="tj kk wm qb">Upcoming Meetings</h4>
+              <div>
+                {% for reunion in upcoming_reunions %}
+                  <div class="tc fg 2xl:ud-gap-6 qb">
+                    <div class="tc wf yf">
+                      <h5 class="wj kk wm xl bn ml il">{{ reunion.title }}</h5>
+                      <p class="sc">{{ reunion.date }} at {{ reunion.start_time }}</p>
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="tc fg 2xl:ud-gap-6">
+                    <div class="tc wf yf">
+                      <h5 class="wj kk wm xl bn ml il">No upcoming meetings</h5>
+                      <p class="sc">Schedule your first meeting to get started</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-5">
+              <h4 class="tj kk wm qb">Quick Actions</h4>
+              <ul>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:create' %}">Schedule Meeting</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:reminder_list' %}">View Reminders</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="#!">Meeting Templates</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="#!">Export Schedule</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /Sidebar -->
+        </div>
+      </div>
+    </section>
+    <!-- ===== Meetings End ===== -->
+
+    <!-- ===== CTA Start ===== -->
+    <section class="i pg gh ji">
+      <img class="h p q" src="{% static 'base_tailwind/images/shape-16.svg' %}" alt="Bg Shape" />
+      <div class="bb ye i z-10 ki xn dr">
+        <div class="tc uf sn tn un gg">
+          <div class="animate_left to/2">
+            <h2 class="fk vj zp pr lk ac">
+              Streamline Your Meetings with Our Tracker
+            </h2>
+            <p class="lk">
+              Organize, schedule, and track all your meetings in one place. Collaborate effectively with your team and never miss an important discussion.
+            </p>
+          </div>
+          <div class="animate_right bf">
+            <a href="{% url 'reunion:create' %}" class="vc ek kk hh rg ol il cm gi hi">
+              Get Started Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ===== CTA End ===== -->
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <!-- Footer Top -->
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+          <div class="animate_top zd/2 to/4">
+            <a href="{% url 'reunion:list' %}">
+              <img src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo" class="om" />
+              <img src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo" class="xc nm" />
+            </a>
+            <p class="lc fb">Streamline your workflow with our productivity tools.</p>
+            <ul class="tc wf cg">
+              <li><a href="#!" class="xl">Facebook</a></li>
+              <li><a href="#!" class="xl">Twitter</a></li>
+              <li><a href="#!" class="xl">LinkedIn</a></li>
+            </ul>
+          </div>
+
+          <div class="vd ro tc sf rn un gg vn">
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Quick Links</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Home</a></li>
+                <li><a href="#!" class="sc xl vb">Product</a></li>
+                <li><a href="#!" class="sc xl vb">Careers</a></li>
+                <li><a href="#!" class="sc xl vb">Pricing</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Services</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Web Development</a></li>
+                <li><a href="#!" class="sc xl vb">Graphics Design</a></li>
+                <li><a href="#!" class="sc xl vb">Digital Marketing</a></li>
+                <li><a href="#!" class="sc xl vb">Ui/Ux Design</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Support</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Company</a></li>
+                <li><a href="#!" class="sc xl vb">Press media</a></li>
+                <li><a href="#!" class="sc xl vb">Our Blog</a></li>
+                <li><a href="#!" class="sc xl vb">Contact Us</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Newsletter</h4>
+              <p class="ac qe">Subscribe to receive future updates</p>
+              <form action="https://formbold.com/s/unique_form_id" method="POST">
+                <div class="i">
+                  <input type="text" placeholder="Email address"
+                         class="vd sm _g ch pm vk xm rg gm dm dn gi mi" />
+                  <button class="h q fi">
+                    Subscribe
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <ul class="tc wf gg">
+            <li><a href="#!" class="xl">English</a></li>
+            <li><a href="#!" class="xl">Privacy Policy</a></li>
+            <li><a href="#!" class="xl">Support</a></li>
+          </ul>
+        </div>
+        <div class="animate_top">
+          <p>&copy; 2025 Personal Meeting Tracker. All rights reserved.</p>
+        </div>
+      </div>
+      <!-- Footer Bottom -->
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
+
+  <!-- ====== Back To Top Start ===== -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a"
+          @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+          @scroll.window="scrollTop = (window.pageYOffset > 50)"
+          :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path
+        d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+  <!-- ====== Back To Top End ===== -->
+
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+</body>
+</html>

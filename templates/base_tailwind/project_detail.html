@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - Personal Tracker{% endblock %}
+
+{% block content %}
+<!-- ===== Project Detail Start ===== -->
+<section class="pg pj vp mr oj">
+  <div class="bb ze ki xn 2xl:ud-px-0">
+    
+    <!-- Breadcrumb -->
+    <div class="animate_top tc wf ag fb">
+      <a href="{% url 'projects:home' %}" class="xl uj">Projets</a>
+      <span class="pk">/</span>
+      <span class="pk">{{ project.title }}</span>
+    </div>
+
+    <!-- Project Header -->
+    <div class="animate_top sg hh rm vk xm yh mb">
+      <div class="tc uf yo ap">
+        <div>
+          <h1 class="fk vj kk wm fb">{{ project.title }}</h1>
+          <p class="pk">{{ project.description }}</p>
+        </div>
+        <div class="tc gap-3 bf">
+          {% if user.is_authenticated and project.user == user %}
+          <a href="{% url 'projects:project_update' project.pk %}" 
+             class="vc rg lk gh ml il hi gi _l">
+            <svg class="uh ub" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Modifier
+          </a>
+          <a href="{% url 'projects:project_delete' project.pk %}" 
+             class="vc rg lk kh ml il hi gi cm">
+            <svg class="uh ub" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Supprimer
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Stats -->
+    <div class="wc qf pn xo zf kb">
+      <!-- Stat Card -->
+      <div class="animate_top sg hh rm vk xm yh rj">
+        <div class="tc wf xf cf ae cd rg gh fb">
+          <svg class="uh" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+        </div>
+        <h4 class="ek yj kk wm zb">Statut</h4>
+        <p class="pk">{{ project.get_status_display }}</p>
+      </div>
+
+      <!-- Stat Card -->
+      <div class="animate_top sg hh rm vk xm yh rj">
+        <div class="tc wf xf cf ae cd rg 
+          {% if project.is_overdue %}kh{% else %}nh{% endif %} fb">
+          <svg class="uh" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <h4 class="ek yj kk wm zb">Date limite</h4>
+        <p class="pk">{{ project.deadline }}</p>
+        {% if project.is_overdue %}
+        <span class="uj kh">(En retard)</span>
+        {% else %}
+        <span class="uj nh">({{ project.days_remaining }} jours restants)</span>
+        {% endif %}
+      </div>
+
+      <!-- Stat Card -->
+      <div class="animate_top sg hh rm vk xm yh rj">
+        <div class="tc wf xf cf ae cd rg gh fb">
+          <svg class="uh" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <h4 class="ek yj kk wm zb">Progression</h4>
+        <div class="vd fb">
+          <div class="vd rh sg" style="height: 0.5rem;">
+            <div class="gh sg" style="width: {{ project.progress }}%; height: 0.5rem;"></div>
+          </div>
+          <p class="pk ac">{{ project.progress }}%</p>
+        </div>
+      </div>
+
+      <!-- Stat Card -->
+      <div class="animate_top sg hh rm vk xm yh rj">
+        <div class="tc wf xf cf ae cd rg oh fb">
+          <svg class="uh" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <h4 class="ek yj kk wm zb">Temps total</h4>
+        <p class="pk">{{ project.total_time }} heures</p>
+      </div>
+    </div>
+
+    <!-- Tasks Section -->
+    <div class="animate_top sg hh rm vk xm yh kb">
+      <div class="tc yf wf fb">
+        <h2 class="ek tj kk wm">Tâches du projet</h2>
+        <a href="#" class="vc rg lk gh ml il hi gi _l">
+          <svg class="uh ub" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nouvelle tâche
+        </a>
+      </div>
+
+      <!-- Task Stats -->
+      <div class="wc rf qn zf kb">
+        <div class="rj yh sg jh">
+          <h4 class="ek zj lk wm fb">{{ total_tasks }}</h4>
+          <p class="lk">Total</p>
+        </div>
+        <div class="rj yh sg nh">
+          <h4 class="ek zj lk wm fb">{{ completed_tasks }}</h4>
+          <p class="lk">Terminées</p>
+        </div>
+        <div class="rj yh sg oh">
+          <h4 class="ek zj lk wm fb">{{ pending_tasks }}</h4>
+          <p class="lk">En attente</p>
+        </div>
+      </div>
+
+      <!-- Tasks List -->
+      {% if tasks %}
+      <div class="vd">
+        {% for task in tasks %}
+        <div class="tc yf wf sg pm ah ch vi _i fb">
+          <div class="tc wf gap-3">
+            <input type="checkbox" {% if task.is_completed %}checked{% endif %} 
+                   class="pf ie ld rg">
+            <div>
+              <h4 class="ek bk kk wm">{{ task.title }}</h4>
+              {% if task.description %}
+              <p class="uj pk">{{ task.description|truncatewords:15 }}</p>
+              {% endif %}
+            </div>
+          </div>
+          <div class="tc wf gap-3">
+            <span class="sc uj rg xi ti
+              {% if task.priority == 'high' %}kh
+              {% elif task.priority == 'medium' %}oh
+              {% else %}nh{% endif %} lk">
+              {{ task.get_priority_display }}
+            </span>
+            <span class="uj pk">{{ task.deadline }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="rj yh qb">
+        <p class="pk">Aucune tâche pour ce projet. Créez-en une pour commencer!</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+<!-- ===== Project Detail End ===== -->
+{% endblock %}

@@ -1,0 +1,386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Session History – Personal Tracker</title>
+
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .table-row {
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+    .table-row:hover {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(249, 250, 251, 1) 100%);
+      border-left-color: #3b82f6;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+  </style>
+</head>
+
+<body
+  x-data="{ page: 'home', darkMode: true, stickyMenu: false, navigationOpen: false, scrollTop: false }"
+  x-init="
+    darkMode = JSON.parse(localStorage.getItem('darkMode') || 'false');
+    $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))
+  "
+  :class="{'b eh': darkMode === true}"
+>
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+  <!-- ===== Header End ===== -->
+
+  <!-- ===== Main Content ===== -->
+  <main class="mt-24 lg:mt-28 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Page header -->
+    <div class="fade-in mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">📋 Session history</h1>
+          <p class="text-sm opacity-70">View and manage all your study sessions</p>
+        </div>
+        <a href="{% url 'study:home' %}" 
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition shadow-lg hover:shadow-xl">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to timer
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 fade-in">
+      <div class="stat-card p-5 rounded-2xl border shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="p-3 rounded-xl bg-blue-100">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm opacity-70">Total sessions</div>
+            <div class="text-2xl font-bold text-blue-600">{{ sessions|length }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card p-5 rounded-2xl border shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="p-3 rounded-xl bg-purple-100">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm opacity-70">Total time</div>
+            <div class="text-2xl font-bold text-purple-600">
+              {{ total_hours }}h {{ total_minutes }}min
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card p-5 rounded-2xl border shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="p-3 rounded-xl bg-green-100">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="text-sm opacity-70">Finished sessions</div>
+            <div class="text-2xl font-bold text-green-600">{{ sessions|length }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sessions table -->
+    <div class="fade-in">
+      <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+        
+        <!-- Table header + search / sort -->
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-semibold flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+                Full list of sessions
+              </h2>
+              <p class="text-xs text-slate-500 mt-1">
+                💡 You can click on a session title to edit it directly.
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-2 flex items-center text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+                  </svg>
+                </span>
+                <input id="sessionsSearch"
+                       class="pl-7 pr-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                       type="search" placeholder="Search by title...">
+              </div>
+
+              <select id="sessionsSort"
+                      class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <option value="date_desc">Newest first</option>
+                <option value="date_asc">Oldest first</option>
+                <option value="duration_desc">Longest first</option>
+                <option value="duration_asc">Shortest first</option>
+                <option value="title_asc">Title A → Z</option>
+                <option value="title_desc">Title Z → A</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsive table -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead class="bg-slate-50 text-slate-600">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                  Title
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                  Date & Time
+                </th>
+                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                  Duration
+                </th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-slate-100">
+              {% for s in sessions %}
+                <tr class="table-row"
+                    data-title="{{ s.title|default:'Untitled session'|lower }}"
+                    data-date="{{ s.started_at|date:'Y-m-d H:i' }}"
+                    data-duration="{{ s.duration_seconds|default:0 }}">
+                  <!-- Inline editable title -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                      <input
+                        type="text"
+                        value="{{ s.title|default:'Untitled session' }}"
+                        data-url="{% url 'study:session_rename' s.pk %}"
+                        class="js-session-title w-full bg-transparent border border-transparent rounded-lg px-2 py-1
+                               text-sm font-medium text-slate-900
+                               focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-300"
+                      />
+                    </div>
+                  </td>
+                  
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2 text-sm">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      <span>{{ s.started_at|date:"d/m/Y" }}</span>
+                      <span class="text-slate-400">•</span>
+                      <span class="text-slate-600">{{ s.started_at|date:"H:i" }}</span>
+                    </div>
+                  </td>
+                  
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      {% widthratio s.duration_seconds 60 1 %} min
+                    </span>
+                  </td>
+                </tr>
+
+              {% empty %}
+                <tr>
+                  <td colspan="3" class="px-6 py-12">
+                    <div class="text-center">
+                      <svg class="mx-auto w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                      </svg>
+                      <h3 class="text-lg font-medium text-slate-600 mb-2">No sessions yet</h3>
+                      <p class="text-sm text-slate-500 mb-4">Start a new session to see it appear here.</p>
+                      <a href="{% url 'study:home' %}" 
+                         class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Create a session
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table footer -->
+        {% if sessions %}
+        <div class="px-6 py-4 bg-slate-50 border-t">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-600">
+              Total: <strong class="text-slate-900">{{ sessions|length }}</strong> session{{ sessions|length|pluralize }}
+            </span>
+            <span class="text-slate-500">
+              Last update: {{ sessions.0.started_at|date:"d/m/Y \\a\\t H:i" }}
+            </span>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Back To Top -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a" @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+    @scroll.window="scrollTop = (window.pageYOffset > 50) ? true : false" :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+
+  <!-- Inline title editing + search/sort JS -->
+  <script>
+    // CSRF
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    async function saveTitle(input) {
+      const url = input.dataset.url;
+      const title = input.value.trim();
+
+      const formData = new FormData();
+      formData.append('title', title);
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: formData,
+        });
+
+        if (!res.ok) throw new Error('Server error');
+        await res.json();
+
+        input.classList.remove('ring-red-400');
+        input.classList.add('ring-1', 'ring-emerald-400');
+        setTimeout(() => input.classList.remove('ring-1', 'ring-emerald-400'), 600);
+      } catch (e) {
+        console.error(e);
+        input.classList.add('ring-1', 'ring-red-400');
+        setTimeout(() => input.classList.remove('ring-1', 'ring-red-400'), 800);
+      }
+    }
+
+    document.querySelectorAll('.js-session-title').forEach((input) => {
+      input.addEventListener('blur', () => saveTitle(input));
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.blur();
+        }
+      });
+    });
+
+    // Search + sort
+    (function () {
+      const searchInput = document.getElementById('sessionsSearch');
+      const sortSelect = document.getElementById('sessionsSort');
+      const tbody = document.querySelector('tbody');
+      if (!tbody) return;
+
+      const rows = Array.from(tbody.querySelectorAll('tr[data-title]'));
+
+      function applyFilters() {
+        const q = (searchInput.value || '').trim().toLowerCase();
+        const sort = sortSelect.value;
+
+        let filtered = rows.filter(row => {
+          const title = row.dataset.title || '';
+          return !q || title.includes(q);
+        });
+
+        filtered.sort((a, b) => {
+          switch (sort) {
+            case 'date_asc':
+              return a.dataset.date.localeCompare(b.dataset.date);
+            case 'date_desc':
+              return b.dataset.date.localeCompare(a.dataset.date);
+            case 'duration_asc':
+              return (parseInt(a.dataset.duration || '0', 10) -
+                      parseInt(b.dataset.duration || '0', 10));
+            case 'duration_desc':
+              return (parseInt(b.dataset.duration || '0', 10) -
+                      parseInt(a.dataset.duration || '0', 10));
+            case 'title_desc':
+              return (b.dataset.title || '').localeCompare(a.dataset.title || '');
+            case 'title_asc':
+            default:
+              return (a.dataset.title || '').localeCompare(a.dataset.title || '');
+          }
+        });
+
+        tbody.innerHTML = '';
+        filtered.forEach(row => tbody.appendChild(row));
+      }
+
+      if (searchInput && sortSelect) {
+        searchInput.addEventListener('input', applyFilters);
+        sortSelect.addEventListener('change', applyFilters);
+        applyFilters();
+      }
+    })();
+  </script>
+
+</body>
+</html>
