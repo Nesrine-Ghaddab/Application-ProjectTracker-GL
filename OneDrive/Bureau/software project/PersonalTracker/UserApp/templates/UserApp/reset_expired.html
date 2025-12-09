@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Lien expiré</title>
+
+  <link rel="icon" href="{% static 'UserApp/favicon.ico' %}">
+  <link href="{% static 'UserApp/style.css' %}" rel="stylesheet">
+</head>
+
+<body x-data="{ darkMode: true }" :class="{ 'b eh': darkMode }">
+
+  <section class="i pg fh rm ki xn vq gj qp gr hj rp hr">
+
+    <!-- Shapes -->
+    <img src="{% static 'UserApp/images/shape-06.svg' %}" class="h j k">
+    <img src="{% static 'UserApp/images/shape-03.svg' %}" class="h l m">
+    <img src="{% static 'UserApp/images/shape-17.svg' %}" class="h n o">
+    <img src="{% static 'UserApp/images/shape-18.svg' %}" class="h p q">
+
+    <div class="animate_top bb af i va sg hh sm vk xm yi _n jp hi ao kp text-center">
+
+      <h2 class="ek ck kk wm xb">Lien expiré</h2>
+      <p class="text-gray-500 mt-2">
+        Le lien de réinitialisation a expiré (15 minutes).  
+        Veuillez demander un nouveau lien.
+      </p>
+
+      <a href="{% url 'password_reset' %}"
+         class="vd rj ek rc rg gh lk ml il _l gi hi mt-6 inline-block">
+        Réenvoyer un lien
+      </a>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="bb ze ki xn">
+      <div class="bh ch pm tc">
+        <p class="animate_top">© 2025 Base. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script defer src="{% static 'UserApp/bundle.js' %}"></script>
+
+</body>
+</html>

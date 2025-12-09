@@ -1,0 +1,583 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon Profil</title>
+
+  <link rel="icon" href="{% static 'UserApp/favicon.ico' %}">
+  <link href="{% static 'UserApp/style.css' %}" rel="stylesheet">
+  
+  <style>
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes shine {
+      0% {
+        background-position: -200% center;
+      }
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .animate-fade-in-left {
+      animation: fadeInLeft 0.6s ease-out forwards;
+    }
+
+    .animate-fade-in-right {
+      animation: fadeInRight 0.6s ease-out forwards;
+    }
+
+    .animate-delay-1 {
+      animation-delay: 0.1s;
+      opacity: 0;
+    }
+
+    .animate-delay-2 {
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+
+    .animate-delay-3 {
+      animation-delay: 0.3s;
+      opacity: 0;
+    }
+
+    .animate-delay-4 {
+      animation-delay: 0.4s;
+      opacity: 0;
+    }
+
+    /* Profile Card Styles */
+    .profile-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+    }
+
+    .profile-avatar {
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .profile-avatar::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      background: linear-gradient(45deg, #6366f1, #a855f7, #ec4899, #6366f1);
+      border-radius: 50%;
+      z-index: -1;
+      animation: pulse 2s ease-in-out infinite;
+      background-size: 300% 300%;
+      animation: shine 3s linear infinite, pulse 2s ease-in-out infinite;
+    }
+
+    .profile-avatar:hover {
+      transform: scale(1.05) rotate(5deg);
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .info-card {
+      background: rgba(31, 41, 55, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .info-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .badge-item {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .badge-item:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+    }
+
+    .quote-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-card::before {
+      content: '"';
+      position: absolute;
+      top: -20px;
+      left: 10px;
+      font-size: 120px;
+      opacity: 0.1;
+      font-family: Georgia, serif;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .status-online {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-offline {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+      transform: translateY(-3px);
+    }
+
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body 
+  x-data="{ page: 'profile', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="
+      darkMode = JSON.parse(localStorage.getItem('darkMode'));
+      $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+
+
+  <!-- ===== Header Start ===== -->
+  <header class="g s r vd ya cj" :class="{ 'hh sm _k dj bl ll' : stickyMenu }"
+    @scroll.window="stickyMenu = (window.pageYOffset > 20) ? true : false">
+    <div class="bb ze ki xn 2xl:ud-px-0 oo wf yf i">
+      <div class="vd to/4 tc wf yf">
+        <a href="/">
+          <img class="om" src="{% static 'UserApp/images/logo-light.svg' %}" alt="Logo Light" />
+          <img class="xc nm" src="{% static 'UserApp/images/logo-dark.svg' %}" alt="Logo Dark" />
+        </a>
+
+        <!-- Hamburger Toggle BTN -->
+        <button class="po rc" @click="navigationOpen = !navigationOpen">
+          <span class="rc i pf re pd">
+            <span class="du-block h q vd yc">
+              <span class="rc i r s eh um tg te rd eb ml jl dl" :class="{ 'ue el': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl fl" :class="{ 'ue qr': !navigationOpen }"></span>
+              <span class="rc i r s eh um tg te rd eb ml jl gl" :class="{ 'ue hl': !navigationOpen }"></span>
+            </span>
+          </span>
+        </button>
+      </div>
+
+      <div class="vd wo/4 sd qo f ho oo wf yf" :class="{ 'd hh rm sr td ud qg ug jc yh': navigationOpen }">
+        <nav>
+          <ul class="tc _o sf yo cg ep">
+            <li><a href="/" class="xl">Home</a></li>
+            <li><a href="#" class="xl">Features</a></li>
+            <li><a href="#" class="xl">Pricing</a></li>
+
+            <li class="c i" x-data="{ dropdown: false }">
+              <a href="#!" class="xl tc wf yf bg" @click.prevent="dropdown = !dropdown">User Pages</a>
+
+              <ul class="a" :class="{ 'tc': dropdown }">
+                <li><a href="{% url 'profile' %}" class="xl mk">My Profile</a></li>
+                <li><a href="{% url 'edit_profile' %}" class="xl">Edit Profile</a></li>
+                <li><a href="{% url 'logout' %}" class="xl">Logout</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="tc wf ig pb no">
+          <a href="{% url 'logout' %}" class="ek pk xl">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- ===== Header End ===== -->
+
+
+  <!-- ===== Profile Section ===== -->
+  <section class="i pg fh rm ki xn vq gj qp gr hj rp hr">
+
+    <!-- Background Shapes -->
+    <img src="{% static 'UserApp/images/shape-06.svg' %}" class="h j k floating" />
+    <img src="{% static 'UserApp/images/shape-03.svg' %}" class="h l m floating" style="animation-delay: 0.5s;" />
+    <img src="{% static 'UserApp/images/shape-17.svg' %}" class="h n o floating" style="animation-delay: 1s;" />
+    <img src="{% static 'UserApp/images/shape-18.svg' %}" class="h p q floating" style="animation-delay: 1.5s;" />
+
+    <div class="bb ze ki xn 2xl:ud-px-0" style="max-width: 1400px; margin: 0 auto; padding: 2rem;">
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner animate-fade-in-up mb-8">
+        <div style="position: relative; z-index: 1;">
+          <h1 class="text-4xl font-bold mb-2" id="welcome-message">Bienvenue</h1>
+          <div id="connection-status" class="status-indicator mt-3" style="display: inline-flex;">
+            <span class="status-dot"></span>
+            <span>En ligne</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid Layout -->
+      <div class="grid-layout">
+        
+        <!-- Left Column - Profile Card -->
+        <div class="animate-fade-in-left animate-delay-1">
+          <div class="profile-card" style="border-radius: 24px; padding: 2.5rem; text-align: center;">
+            
+            <div class="profile-avatar" style="width: 180px; height: 180px; margin: 0 auto 2rem;">
+              <img src="{{ user.photo.url }}"
+                   style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid white;"
+                   alt="Photo">
+            </div>
+
+            <h2 class="text-3xl font-bold mb-2" style="color: #1f2937;">{{ user.nom }} {{ user.prenom }}</h2>
+            <p style="color: #6b7280; font-size: 1.125rem; margin-bottom: 1.5rem;">{{ user.email }}</p>
+
+            <!-- Role Badge -->
+            <div style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.5rem 1.5rem; border-radius: 9999px; font-weight: 600; margin-bottom: 2rem;">
+              {{ user.role|capfirst }}
+            </div>
+
+            <!-- Stats -->
+            <div class="info-grid" style="margin-top: 2rem;">
+              <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">Membre depuis</div>
+                <div style="font-weight: 700; font-size: 1.125rem; margin-top: 0.25rem;">{{ user.dateInscription|date:"M Y" }}</div>
+              </div>
+              
+              <div class="stat-card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏆</div>
+                <div style="font-size: 0.875rem; color: #6b7280;">Badges</div>
+                <div style="font-weight: 700; font-size: 1.125rem; margin-top: 0.25rem;">{{ user.badges.count }}</div>
+              </div>
+            </div>
+
+            <!-- Edit Button -->
+            <a href="{% url 'edit_profile' %}"
+               class="vd rj ek rc rg gh lk ml il _l gi hi"
+               style="margin-top: 2rem; display: inline-block; width: 100%; text-align: center; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-weight: 600; transition: all 0.3s ease; text-decoration: none;">
+              ✏️ Modifier Profil
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column - Info Cards -->
+        <div class="animate-fade-in-right animate-delay-2">
+          
+          <!-- Badges Section -->
+          <div class="info-card mb-6">
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; color: #1f2937;">
+              🏅 Mes Badges
+            </h3>
+
+            {% if user.badges.all %}
+              <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                {% for badge in user.badges.all %}
+                  <div class="badge-item" style="display: flex; align-items: center; gap: 0.75rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%); padding: 0.75rem 1.5rem; border-radius: 9999px; border: 1px solid rgba(99, 102, 241, 0.2);">
+                    <span style="font-size: 1.75rem;">{{ badge.emoji }}</span>
+                    <span style="font-weight: 600; color: #4f46e5;">{{ badge.name }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p style="color: #9ca3af; text-align: center; padding: 2rem;">Aucun badge pour le moment.</p>
+            {% endif %}
+          </div>
+
+          <!-- User Information Grid -->
+          <div class="info-grid mb-6">
+            <div class="info-card">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <span style="font-size: 1.5rem;">👤</span>
+                <span style="font-weight: 600; color: #6b7280;">Nom</span>
+              </div>
+              <p style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">{{ user.nom }}</p>
+            </div>
+
+            <div class="info-card">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <span style="font-size: 1.5rem;">✨</span>
+                <span style="font-weight: 600; color: #6b7280;">Prénom</span>
+              </div>
+              <p style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">{{ user.prenom }}</p>
+            </div>
+
+            <div class="info-card">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <span style="font-size: 1.5rem;">📧</span>
+                <span style="font-weight: 600; color: #6b7280;">Email</span>
+              </div>
+              <p style="font-size: 1rem; font-weight: 600; color: #1f2937; word-break: break-all;">{{ user.email }}</p>
+            </div>
+
+            <div class="info-card">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <span style="font-size: 1.5rem;">📅</span>
+                <span style="font-weight: 600; color: #6b7280;">Inscription</span>
+              </div>
+              <p style="font-size: 1.25rem; font-weight: 700; color: #1f2937;">{{ user.dateInscription|date:"d M Y" }}</p>
+            </div>
+          </div>
+
+          <!-- Quote of the Day -->
+          <div class="quote-card info-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2.5rem; position: relative;">
+            <div style="position: relative; z-index: 1;">
+              <div style="font-size: 2.5rem; margin-bottom: 1rem;">💭</div>
+              <p id="quote" style="font-size: 1.25rem; font-style: italic; line-height: 1.8; font-weight: 500;">
+                Le succès commence avec la discipline.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ===== Footer ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <p class="animate_top">&copy; 2025 Base - Profile Page. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script defer src="{% static 'UserApp/bundle.js' %}"></script>
+
+
+  <!-- =========================
+       CUSTOM JS ADDITIONS
+  ========================== -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ------------------------------
+       1) Dynamic Welcome Message
+    ------------------------------ */
+    const messageEl = document.getElementById("welcome-message");
+    const hours = new Date().getHours();
+    let greeting = "";
+    let emoji = "";
+
+    if (hours >= 5 && hours < 12) {
+        greeting = "Bonjour";
+        emoji = "🌅";
+    } else if (hours >= 12 && hours < 18) {
+        greeting = "Bonne journée";
+        emoji = "🌞";
+    } else if (hours >= 18 && hours < 22) {
+        greeting = "Bonne soirée";
+        emoji = "🌙";
+    } else {
+        greeting = "Bonne nuit";
+        emoji = "🌑";
+    }
+
+    messageEl.innerHTML = `${emoji} ${greeting}, <span style="color: #fbbf24;">{{ user.prenom }}</span> !`;
+
+
+
+    /* ------------------------------
+       2) Online / Offline Status
+    ------------------------------ */
+    const statusEl = document.getElementById("connection-status");
+
+    function updateStatus() {
+        const dot = statusEl.querySelector('.status-dot');
+        const text = statusEl.querySelector('span:last-child');
+        
+        if (navigator.onLine) {
+            statusEl.className = "status-indicator status-online";
+            dot.style.background = "#10b981";
+            text.textContent = "Vous êtes en ligne";
+        } else {
+            statusEl.className = "status-indicator status-offline";
+            dot.style.background = "#ef4444";
+            text.textContent = "Vous êtes hors ligne";
+        }
+    }
+
+    updateStatus();
+    window.addEventListener("online", updateStatus);
+    window.addEventListener("offline", updateStatus);
+
+
+
+    /* ------------------------------
+       3) Quote of the Day
+    ------------------------------ */
+    const quotes = [
+        "Le succès commence avec la discipline.",
+        "Chaque jour est une nouvelle opportunité.",
+        "N'abandonne jamais, les belles choses prennent du temps.",
+        "Crois en toi et tout devient possible.",
+        "Le futur appartient à ceux qui croient en leurs rêves.",
+        "Fais de ton mieux aujourd'hui pour être fier demain.",
+        "Une petite avancée chaque jour mène à de grands résultats."
+    ];
+
+    const quoteEl = document.getElementById("quote");
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    quoteEl.textContent = randomQuote;
+
+    // Change quote every 10 seconds with fade effect
+    setInterval(() => {
+        quoteEl.style.opacity = "0";
+        setTimeout(() => {
+            const newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            quoteEl.textContent = newQuote;
+            quoteEl.style.opacity = "1";
+        }, 500);
+    }, 10000);
+
+});
+</script>
+
+</body>
+</html>
