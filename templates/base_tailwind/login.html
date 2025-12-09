@@ -18,21 +18,16 @@
          $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
   :class="{'b eh': darkMode === true}">
 
-
-
   <!-- ===== Header Start ===== -->
   {% include 'base_tailwind/header.html' %}
-
   <!-- ===== Header End ===== -->
-
-
 
   <main>
     <!-- ===== SignIn Form Start ===== -->
     <section class="i pg fh rm ki xn vq gj qp gr hj rp hr">
 
       <!-- Background Shapes -->
-      <img src="{% static 'base_tailwind/shape-06.svg' %}" alt="Shape" class="h j k" />
+      <img src="{% static 'base_tailwind/images/shape-06.svg' %}" alt="Shape" class="h j k" />
       <img src="{% static 'base_tailwind/images/shape-03.svg' %}" alt="Shape" class="h l m" />
       <img src="{% static 'base_tailwind/images/shape-17.svg' %}" alt="Shape" class="h n o" />
       <img src="{% static 'base_tailwind/images/shape-18.svg' %}" alt="Shape" class="h p q" />
@@ -83,12 +78,12 @@
 
           <div class="wb">
             <label class="rc kk wm vb" for="password">Please enter the letters below :</label>
-    {{ form.captcha }}
-    
-    {% if form.captcha.errors %}
-        <p class="text-red-500 text-sm mt-1">{{ form.captcha.errors.0 }}</p>
-    {% endif %}
-</div>
+              {{ form.captcha }}
+              
+              {% if form.captcha.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ form.captcha.errors.0 }}</p>
+              {% endif %}
+          </div>
 
 
           <!-- SUBMIT BUTTON -->
@@ -221,6 +216,5 @@
 
   <!-- JS -->
   <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
-
 </body>
 </html>

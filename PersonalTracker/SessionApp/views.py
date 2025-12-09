@@ -27,7 +27,6 @@ from .forms import StudySessionForm
 def landing(request):
     return render(request, "base_tailwind/index.html")
 
-
 @login_required
 def home(request):
     """Dashboard sessions + timer (sessions.html)."""

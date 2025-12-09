@@ -58,14 +58,14 @@
           <!-- NOM -->
           <div class="wb">
             <label class="rc kk wm vb">Nom</label>
-            <input type="text" name="nom" value="{{ form.nom.value }}" placeholder="Votre nom"
+            <input type="text" name="nom" placeholder="Votre nom"
               class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"/>
           </div>
 
           <!-- PRENOM -->
           <div class="wb">
             <label class="rc kk wm vb">Prénom</label>
-            <input type="text" name="prenom" value="{{ form.prenom.value }}" placeholder="Votre prénom"
+            <input type="text" name="prenom" placeholder="Votre prénom"
               class="vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40"/>
           </div>
 
@@ -77,21 +77,21 @@
           </div>
 
           <!-- PASSWORD -->
-         <<div class="wb">
-    <label class="rc kk wm vb">Password</label>
+         <div class="wb">
+            <label class="rc kk wm vb">Password</label>
 
-    <input type="password" name="password"
-           placeholder="***********"
-           class="password-input vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40">
+            <input type="password" name="password"
+                  placeholder="***********"
+                  class="password-input vd hh rg zk _g ch hm dm fm pl/50 xi mi sm xm pm dn/40">
 
-    <!-- Strength Meter -->
-    <div class="password-strength mt-3">
-        <div class="w-full bg-gray-200 rounded h-2 overflow-hidden">
-            <div class="strength-bar h-full w-0 transition-all duration-300"></div>
+            <!-- Strength Meter -->
+            <div class="password-strength mt-3">
+                <div class="w-full bg-gray-200 rounded h-2 overflow-hidden">
+                    <div class="strength-bar h-full w-0 transition-all duration-300"></div>
+                </div>
+                <p class="strength-label text-sm mt-1 text-gray-600"></p>
+            </div>
         </div>
-        <p class="strength-label text-sm mt-1 text-gray-600"></p>
-    </div>
-</div>
 
           <!-- PHOTO -->
           <div class="wb">
@@ -101,21 +101,19 @@
 
           <div class="wb">
             <label class="rc kk wm vb" for="password">Please enter the letters below :</label>
-          {{ form.captcha }}
-          
-          {% if form.captcha.errors %}
-         <p class="text-red-500 text-sm mt-1">{{ form.captcha.errors.0 }}</p>
-         {% endif %}
-        </div>
+            {{ form.captcha }}
+            
+            {% if form.captcha.errors %}
+              <p class="text-red-500 text-sm mt-1">{{ form.captcha.errors.0 }}</p>
+            {% endif %}
+          </div>
 
-
-          <button class="vd rj ek rc rg gh lk ml il _l gi hi">Create Account</button>
+          <button type="submit" class="vd rj ek rc rg gh lk ml il _l gi hi">Create Account</button>
 
           <p class="sj hk xj rj ob">
             Already have an account?
             <a class="mk" href="{% url 'login' %}">Sign In</a>
           </p>
-
         </form>
 
       </div>
@@ -145,5 +143,3 @@
 
 </body>
 </html>
-
-

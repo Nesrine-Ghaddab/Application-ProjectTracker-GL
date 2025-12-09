@@ -14,12 +14,14 @@ urlpatterns = [
     path("accounts/", include("UserApp.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
 
-    path("captcha/", include("captcha.urls")),   
+    path("captcha/", include("captcha.urls")),
 
     path("projects/", include(("Gestion_Projects.urls", "projects"), namespace="projects")),
 
     path("Reunion/", include(("Reunion.urls", "reunion"), namespace="reunion")),
+	path('Notes/', include('Notes.urls')),
 ]
 
 # SERVE MEDIA FILES (IMPORTANT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
