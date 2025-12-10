@@ -3,6 +3,9 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator
 from datetime import datetime, timedelta
 from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Reunion(models.Model):
     # Reunion type choices

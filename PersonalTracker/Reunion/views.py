@@ -17,7 +17,7 @@ class ReunionList(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         """Filter reunions based on search and filter parameters"""
-        queryset = Reunion.objects.all()
+        queryset = Reunion.objects.filter(organizer=self.request.user)
 
         # Get filter type from GET parameters
         filter_type = self.request.GET.get('filter', 'all')
