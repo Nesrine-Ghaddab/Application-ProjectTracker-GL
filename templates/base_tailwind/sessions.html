@@ -1,0 +1,644 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Personal Tracker – Sessions</title>
+
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: {500:'#3b82f6',600:'#2563eb'} }
+        }
+      }
+    }
+  </script>
+
+  <!-- Alpine for header / dark mode -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    @keyframes pulseCard {0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+    @keyframes flashBg {0%{background:#e2e8f0}50%{background:#bfdbfe}100%{background:#e2e8f0}}
+    @keyframes shake {0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+    .timer-card.pulse {animation:pulseCard .8s ease}
+    .timer-card.flash {animation:flashBg 1.2s ease}
+    .timer-card.shake {animation:shake .4s ease}
+    
+    /* Stats cards hover effect */
+    .stat-box {
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+    }
+    .stat-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    
+    /* Chart containers */
+    .chart-container {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      transition: all 0.3s ease;
+    }
+    .chart-container:hover {
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Session list items */
+    .session-item {
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+    .session-item:hover {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, rgba(249, 250, 251, 1) 100%);
+      border-left-color: #3b82f6;
+      transform: translateX(4px);
+    }
+    
+    /* Timer card gradient */
+    .timer-display {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+      border: 2px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    /* Button styles */
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+  </style>
+
+  <script>
+    window.bootstrap = {
+      userName: "{{ display_name|default:''|escapejs }}",
+      suggestion: {{ suggestion|default:50 }},
+      streak: {{ streak|default:0 }},
+      today_minutes: {{ today_minutes|default:0 }},
+      week_minutes: {{ week_minutes|default:0 }},
+      running: {% if running %}{
+        id: {{ running.id }},
+        planned: {{ running.planned_minutes }},
+        brk: {{ running.break_minutes }},
+        title: "{{ running.title|default_if_none:''|escapejs }}"
+      }{% else %}null{% endif %},
+      recent: {{ recent_json|safe }},
+      weekSeries: {{ week_series_json|default:"[]"|safe }}
+    };
+  </script>
+</head>
+
+<body
+  x-data="{ page: 'home', darkMode: true, stickyMenu: false, navigationOpen: false, scrollTop: false }"
+  x-init="
+    darkMode = JSON.parse(localStorage.getItem('darkMode') || 'false');
+    $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))
+  "
+  :class="{'b eh': darkMode === true}"
+>
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+
+  <!-- ===== Header End ===== -->
+
+  <!-- ===== Main Layout ===== -->
+  <main class="mt-24 lg:mt-28 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Quick stats - full width -->
+    <section class="mb-8 animate_top">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="stat-box p-6 rounded-2xl border shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium opacity-70">Today</h3>
+            <svg class="w-8 h-8 text-blue-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div id="stat-today" class="text-3xl font-bold text-blue-600">{{ today_minutes }}m</div>
+          <p class="text-xs opacity-60 mt-1">Study time</p>
+        </div>
+
+        <div class="stat-box p-6 rounded-2xl border shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium opacity-70">This week</h3>
+            <svg class="w-8 h-8 text-purple-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <div id="stat-week" class="text-3xl font-bold text-purple-600">{{ week_minutes }}m</div>
+          <p class="text-xs opacity-60 mt-1">Weekly total</p>
+        </div>
+
+        <div class="stat-box p-6 rounded-2xl border shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium opacity-70">Streak</h3>
+            <svg class="w-8 h-8 text-orange-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+            </svg>
+          </div>
+          <div id="stat-streak" class="text-3xl font-bold text-orange-600">{{ streak }} 🔥</div>
+          <p class="text-xs opacity-60 mt-1">Consecutive days</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main content grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Sidebar -->
+      <aside class="lg:col-span-4 space-y-6">
+        
+        <!-- Recent sessions -->
+        <section class="chart-container p-5 rounded-2xl shadow-sm animate_top">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-lg">Recent sessions</h3>
+            <a href="{% url 'study:session_list' %}" class="text-sm text-blue-600 hover:text-blue-700 hover:underline transition">
+              View all →
+            </a>
+          </div>
+          <ul id="sessionList" class="space-y-2"></ul>
+        </section>
+
+        <!-- Productivity score -->
+        <section class="chart-container p-5 rounded-2xl shadow-sm animate_top">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold">Productivity score</h3>
+            <i data-lucide="sparkles" class="w-5 h-5 text-purple-500"></i>
+          </div>
+          <div class="text-center py-6">
+            <div id="score-productivity"
+                 class="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              76
+            </div>
+            <p class="text-sm opacity-70 mt-2">
+              Based on focus time and staying on this tab
+            </p>
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- Main content -->
+      <section class="lg:col-span-8 space-y-6">
+        
+        <!-- Pomodoro timer -->
+        <div class="chart-container p-6 rounded-2xl shadow-sm animate_top">
+          <h3 class="text-xl font-semibold mb-4">⏱️ Smart timer (Pomodoro)</h3>
+          
+          <!-- Inputs -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium mb-2">Session title</label>
+              <input id="fldTitle" type="text" placeholder="e.g. Networks revision" 
+                     class="w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-sm font-medium mb-2">Focus (min)</label>
+                <input id="inpStudy" type="number" value="{{ suggestion|default:50 }}" 
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Break (min)</label>
+                <input id="inpBreak" type="number" value="10" 
+                       class="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2 opacity-0">-</label>
+                <button id="btnSuggest" class="w-full px-3 py-2.5 rounded-xl border border-blue-300 hover:bg-blue-50 transition text-sm font-medium text-blue-600">
+                  Suggest
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timer Display -->
+          <div id="timerCard" class="timer-card timer-display rounded-2xl p-8 mb-4">
+            <div class="text-center">
+              <div id="timerPhase" class="text-sm uppercase tracking-widest font-semibold text-blue-600 mb-2">Focus</div>
+              <div id="timerDisplay" class="text-7xl font-bold mb-6 font-mono">--:--</div>
+              <div class="flex items-center justify-center gap-3">
+                <button id="btnStartServer" class="btn-primary px-6 py-3 rounded-xl text-white font-medium shadow-lg">
+                  ▶ Start
+                </button>
+                <button id="btnPause" class="px-6 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 font-medium transition">
+                  ⏸ Pause
+                </button>
+                <button id="btnStopServer" class="px-6 py-3 rounded-xl border-2 border-red-300 text-red-600 hover:bg-red-50 font-medium transition hidden">
+                  ⏹ Stop
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-2 text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded-xl p-3">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <p>
+              <strong>Tip:</strong> Stay on this tab during your session to increase your productivity score.
+            </p>
+          </div>
+
+          <input type="hidden" id="runningSessionId" value="{% if running %}{{ running.id }}{% endif %}">
+        </div>
+
+        <!-- Weekly study time chart -->
+        <div class="chart-container p-6 rounded-2xl shadow-sm animate_top">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-lg">📊 Weekly study time</h3>
+            <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-500"></i>
+          </div>
+          <canvas id="chart-week" style="max-height: 250px;"></canvas>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 px-5 py-3 rounded-xl bg-slate-900 text-white shadow-2xl text-sm font-medium z-50">
+    Message
+  </div>
+
+  <!-- ====== Back To Top Start ===== -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a" @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+    @scroll.window="scrollTop = (window.pageYOffset > 50) ? true : false" :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+  <!-- ====== Back To Top End ===== -->
+
+  <!-- ===== Integration JS ===== -->
+  <script>
+    /* ---------- Navigation (optional) ---------- */
+    const views = {
+      dashboard: document.getElementById('view-dashboard'),
+      study: document.getElementById('view-study'),
+      projects: document.getElementById('view-projects'),
+      planner: document.getElementById('view-planner'),
+      analytics: document.getElementById('view-analytics'),
+      habits: document.getElementById('view-habits'),
+      meetings: document.getElementById('view-meetings')
+    };
+    function showView(id){
+      Object.values(views).forEach(v => v && v.classList.add('hidden'));
+      if (views[id]) views[id].classList.remove('hidden');
+    }
+    document.querySelectorAll('.nav-btn').forEach(b =>
+      b.addEventListener('click', () => showView(b.dataset.target))
+    );
+    const toast = (m) => {
+      const t = document.getElementById('toast');
+      t.textContent = m;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 1600);
+    };
+    lucide.createIcons();
+
+    /* ---------- DOM helpers ---------- */
+    const sessionList = document.getElementById('sessionList');
+    function renderRecent(list){
+      if(!list || !list.length){
+        sessionList.innerHTML = '<li>No recent sessions.</li>';
+        return;
+      }
+      sessionList.innerHTML = list.map(s => `
+        <li class="session-item p-2 rounded-lg bg-slate-50 flex items-center justify-between">
+          <span>${s.title || 'Session'} — ${
+            s.is_running
+              ? '<span class="text-blue-600">running</span>'
+              : (s.duration_minutes + ' min')
+          }</span>
+          <span class="opacity-70">${new Date(s.started_at).toLocaleDateString()}</span>
+        </li>`).join('');
+    }
+    try {
+      renderRecent(JSON.parse(window.bootstrap.recent || "[]"));
+    } catch {
+      renderRecent([]);
+    }
+
+    function setStats({today_minutes, week_minutes, streak}){
+      document.getElementById('stat-today').textContent = `${today_minutes}m`;
+      document.getElementById('stat-week').textContent = `${week_minutes}m`;
+      document.getElementById('stat-streak').textContent = `${streak}🔥`;
+    }
+
+    /* ---------- CSRF & API ---------- */
+    function getCookie(name){
+      const v = `; ${document.cookie}`.split(`; ${name}=`);
+      if(v.length === 2) return v.pop().split(';').shift();
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    async function apiStart({title, study, brk}){
+      const fd = new FormData();
+      fd.append('title', title || '');
+      fd.append('planned_minutes', study || 50);
+      fd.append('break_minutes', brk || 10);
+      const r = await fetch("{% url 'study:api_session_start' %}", {
+        method:'POST',
+        headers:{'X-CSRFToken':csrftoken},
+        body:fd
+      });
+      if(!r.ok) throw new Error('start failed');
+      return r.json();
+    }
+   async function apiStop(id){
+  const fd = new FormData();
+  fd.append('session_id', id);
+  const r = await fetch("{% url 'study:api_session_stop' %}", {
+    method:'POST',
+    headers:{'X-CSRFToken':csrftoken},
+    body:fd
+  });
+  if(!r.ok) throw new Error('stop failed');
+  return r.json();   // <--- IMPORTANT
+}
+
+    async function apiSummary(){
+      const r = await fetch("{% url 'study:api_summary' %}");
+      if(!r.ok) throw new Error('summary failed');
+      return r.json();
+    }
+
+    /* ---------- Timer & productivity ---------- */
+    let runningId = document.getElementById('runningSessionId').value
+                    || (window.bootstrap.running ? window.bootstrap.running.id : "");
+    let studyMinutes = window.bootstrap.running
+                      ? window.bootstrap.running.planned
+                      : (window.bootstrap.suggestion || 50);
+    let breakMinutes = window.bootstrap.running
+                      ? window.bootstrap.running.brk
+                      : 10;
+    let isBreak = false,
+        remaining = (studyMinutes * 60),
+        timer = null;
+
+    // Productivity score (0..100)
+    let productivity = 76;
+    const prodEl = document.getElementById('score-productivity');
+    let focusTicks = 0; // seconds of focused time
+
+    function renderProductivity(){
+      productivity = Math.min(100, Math.max(0, productivity));
+      prodEl.textContent = Math.round(productivity);
+    }
+    renderProductivity();
+
+    const disp = document.getElementById('timerDisplay'),
+          phase = document.getElementById('timerPhase'),
+          card = document.getElementById('timerCard');
+
+    function updateDisplay(){
+      const m = String(Math.floor(remaining/60)).padStart(2,'0');
+      const s = String(remaining%60).padStart(2,'0');
+      disp.textContent = `${m}:${s}`;
+      phase.textContent = isBreak ? 'Break' : 'Focus';
+    }
+
+    function animate(cls){
+      card.classList.remove('pulse','flash','shake');
+      void card.offsetWidth;
+      card.classList.add(cls);
+      setTimeout(() => card.classList.remove(cls),700);
+    }
+
+    function beep(freq=880, ms=220){
+      try{
+        const C = window.AudioContext || window.webkitAudioContext;
+        const ctx = new C();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = freq;
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        g.gain.setValueAtTime(0.15, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + ms/1000);
+        o.stop(ctx.currentTime + ms/1000);
+      }catch{}
+    }
+
+    function notify(msg){
+      if('vibrate' in navigator) navigator.vibrate(100);
+      toast(msg);
+    }
+
+    function startLocal(){
+      if(timer) return;
+      timer = setInterval(() => {
+        remaining--;
+
+        // Track focused time for productivity
+        if (!document.hidden && !isBreak) {
+          focusTicks++;
+          if (focusTicks >= 60) {        // every minute of focused work
+            productivity += 2;          // reward
+            focusTicks = 0;
+            renderProductivity();
+          }
+        }
+
+        if(remaining <= 0){
+          isBreak = !isBreak;
+          remaining = (isBreak ? breakMinutes : studyMinutes) * 60;
+          animate('flash');
+          beep(isBreak ? 660 : 880, 260);
+          notify(isBreak ? 'Break time!' : 'Back to focus!');
+        }
+        updateDisplay();
+      }, 1000);
+      document.title = '⏱️ Running — Personal Tracker';
+      animate('pulse');
+    }
+
+    function pauseLocal(){
+      if(timer){
+        clearInterval(timer);
+        timer = null;
+        document.title = 'Personal Tracker';
+        animate('shake');
+      }
+    }
+
+    // If user leaves the tab during a running session, penalize the score
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden && timer){
+        productivity -= 5;
+        renderProductivity();
+      }
+    });
+
+    const btnStart = document.getElementById('btnStartServer'),
+          btnStop = document.getElementById('btnStopServer'),
+          btnPause = document.getElementById('btnPause');
+
+    function setRunningUI(running){
+      if(running){
+        btnStop.classList.remove('hidden');
+        btnStart.disabled = true;
+      } else {
+        btnStop.classList.add('hidden');
+        btnStart.disabled = false;
+      }
+    }
+
+    updateDisplay();
+    if(runningId){
+      setRunningUI(true);
+      startLocal();
+    } else {
+      setRunningUI(false);
+    }
+
+    // Suggest button
+    const btnSuggest = document.getElementById('btnSuggest'),
+          inpStudy = document.getElementById('inpStudy'),
+          inpBreak = document.getElementById('inpBreak');
+
+    btnSuggest.addEventListener('click', () => {
+      const sugg = window.bootstrap.suggestion || 50;
+      inpStudy.value = sugg;
+      if(!runningId && !isBreak){
+        studyMinutes = sugg;
+        remaining = sugg * 60;
+        updateDisplay();
+      }
+      toast(`Suggested: ${sugg} min`);
+    });
+
+    // START
+    btnStart.addEventListener('click', async () => {
+      try{
+        const data = await apiStart({
+          title: document.getElementById('fldTitle').value,
+          study: inpStudy.value,
+          brk: inpBreak.value
+        });
+        runningId = data.session_id;
+        studyMinutes = parseInt(inpStudy.value || '50', 10);
+        breakMinutes = parseInt(inpBreak.value || '10', 10);
+        isBreak = false;
+        remaining = studyMinutes * 60;
+        focusTicks = 0;
+        updateDisplay();
+        startLocal();
+        setRunningUI(true);
+        beep(880, 220);
+        toast('Session started!');
+        const sum = await apiSummary();
+        renderRecent(sum.recent);
+      }catch{
+        toast('Error starting session');
+      }
+    });
+
+    // STOP
+    btnStop.addEventListener('click', async () => {
+  try{
+    const data = await apiStop(runningId);
+
+    pauseLocal();
+    runningId = "";
+    setRunningUI(false);
+    beep(520, 250);
+    notify('Session stopped!');
+
+    // ouvrir automatiquement le PDF dans un nouvel onglet
+    if (data.pdf_url) {
+      window.open(data.pdf_url, '_blank');
+    }
+
+    const sum = await apiSummary();
+    renderRecent(sum.recent);
+    setStats(sum);
+    isBreak = false;
+    remaining = (parseInt(inpStudy.value || '50', 10)) * 60;
+    updateDisplay();
+  }catch{
+    toast('Error stopping session');
+  }
+});
+
+
+    btnPause.addEventListener('click', () => {
+      timer ? pauseLocal() : startLocal();
+    });
+
+    /* ---------- Weekly chart (dynamic) ---------- */
+    function refreshCharts(){
+      const ctxW = document.getElementById('chart-week');
+      if(!ctxW) return;
+
+      const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const dataRaw = window.bootstrap.weekSeries || [];
+      const weekData = (Array.isArray(dataRaw) && dataRaw.length === 7)
+        ? dataRaw
+        : [0,0,0,0,0,0,0];
+
+      new Chart(ctxW,{
+        type:'line',
+        data:{
+          labels:days,
+          datasets:[{
+            label:'Minutes',
+            data:weekData,
+            tension:.35,
+            fill:true
+          }]
+        },
+        options:{
+          plugins:{legend:{display:false}},
+          scales:{y:{beginAtZero:true}}
+        }
+      });
+    }
+
+    /* ---------- Calendar (optional, only if element exists) ---------- */
+    function initCalendar(){
+      const el = document.getElementById('calendar');
+      if(!el) return;
+      const cal = new FullCalendar.Calendar(el,{
+        initialView:'dayGridMonth',
+        height:650,
+        headerToolbar:{left:'prev,next today',center:'title',right:'dayGridMonth,timeGridWeek'},
+        events:[]
+      });
+      cal.render();
+    }
+
+    if (views.study) {
+      showView('study');
+    }
+    refreshCharts();
+    initCalendar();
+  </script>
+</body>
+</html>

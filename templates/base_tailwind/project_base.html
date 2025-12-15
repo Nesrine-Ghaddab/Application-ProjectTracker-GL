@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Personal Study & Project Tracker{% endblock %}</title>
+    <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'base_tailwind/style.css' %}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body x-data="{ page: 'home', 'darkMode': true, 'stickyMenu': false, 'navigationOpen': false, 'scrollTop': false }"
+  x-init="darkMode = JSON.parse(localStorage.getItem('darkMode')); $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+  :class="{'b eh': darkMode === true}">
+  
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+  <!-- ===== Header End ===== -->
+
+  <main>
+    {% if messages %}
+    <div class="bb ze ki xn 2xl:ud-px-0 kb">
+      {% for message in messages %}
+      <div class="sg vk xm yh ac {% if message.tags == 'success' %}gh{% elif message.tags == 'error' %}kh{% elif message.tags == 'warning' %}oh{% else %}jh{% endif %}">
+        <div class="tc wf ag">
+          <span class="ek lk">{{ message }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+          <div class="animate_top zd/2 to/4">
+            <a href="{% url 'home' %}">
+              <img src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo" class="om" />
+              <img src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo" class="xc nm" />
+            </a>
+            <p class="lc fb">Personal Study & Project Tracker</p>
+          </div>
+
+          <div class="vd ro tc sf rn un gg vn">
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Quick Links</h4>
+              <ul>
+                <li><a href="{% url 'home' %}" class="sc xl vb">Home</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'projects:home' %}" class="sc xl vb">Projects</a></li>
+                {% endif %}
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Support</h4>
+              <ul>
+                <li><a href="#support" class="sc xl vb">Contact Us</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <p>&copy; 2025 Personal Tracker. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
+
+  <!-- ====== Back To Top Start ===== -->
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a" @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+    @scroll.window="scrollTop = (window.pageYOffset > 50) ? true : false" :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

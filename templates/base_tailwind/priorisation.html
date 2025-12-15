@@ -1,0 +1,360 @@
+{% extends 'base_tailwind/base_taches.html' %}
+{% load static %}
+
+{% block title %}Priorisation des tâches - En cours{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gj do ir hj sp jr i pg">
+  <div class="bb ze ki xn 2xl:ud-px-0">
+    <div class="tc _o">
+      <div class="animate_left jn/2">
+        <h1 class="fk vj zp or kk wm wb">🎯 Priorisation des tâches actives</h1>
+        <p class="fq">
+          Tâches non terminées triées par urgence réelle :  aujourd'hui → demain → etc.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Métriques globales - Version améliorée -->
+<section class="ji gp uq pg">
+  <div class="bb ze ki xn wq">
+    
+
+    <!-- Bannière d'alerte pour tâches urgentes -->
+    {% if metriques.distribution.retard > 0 or metriques.distribution.aujourdhui > 0 or metriques.distribution.demain > 0 %}
+      <div class="animate_top mb-8">
+        <div class="i pg sg vk xm bi qj border-l-4 border-red-500 bg-gradient-to-r from-red-50 to-orange-50">
+          <div class="p-6">
+            <div class="flex items-center">
+              <div class="mr-4">
+                <div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center">
+                  <span class="text-xl">🚨</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="ek yj zp or kk wm wb text-red-700">
+                  {% if metriques.distribution.retard > 0 %}
+                    ALERTE : {{ metriques.distribution.retard }} tâche{{ metriques.distribution.retard|pluralize:"s" }} en retard !
+                  {% elif metriques.distribution.aujourdhui > 0 %}
+                    URGENT : {{ metriques.distribution.aujourdhui }} tâche{{ metriques.distribution.aujourdhui|pluralize:"s" }} aujourd'hui !
+                  {% else %}
+                    À FAIRE : {{ metriques.distribution.demain }} tâche{{ metriques.distribution.demain|pluralize:"s" }} pour demain !
+                  {% endif %}
+                </h3>
+                <p class="sc ak text-red-600">
+                  Traitez ces tâches en PRIORITÉ ABSOLUE !
+                </p>
+              </div>
+              <div class="text-right">
+                <span class="ek rg bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                  {% if metriques.distribution.retard > 0 %}EN RETARD
+                  {% else %}URGENT{% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Liste des tâches priorisées -->
+    <div class="animate_top">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="ek yj zp or kk wm wb">📋 Classement par urgence réelle</h3>
+          <p class="sc ak text-gray-600 mt-1"> Aujourd'hui → Demain → 2-3 jours → etc.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="ek rg bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+            {{ taches|length }} active{{ taches|length|pluralize }}
+          </span>
+          <a href="{% url 'Taches:frontoffice' %}" 
+              class="ek rg bg-gray-100 text-gray-800 hover:bg-gray-200 px-3 py-1 rounded-full text-sm transition duration-300">
+              Voir toutes
+          </a>
+
+        </div>
+      </div>
+
+      {% if taches %}
+        <div class="space-y-6">
+          {% for tache in taches %}
+            <div class="animate_top" style="animation-delay: {{ forloop.counter|add:"-1" }}00ms">
+              <a href="{% url 'Taches:tache_detail' tache.pk %}" class="text-decoration-none block hover:no-underline">
+                <div class="i pg sg vk xm bi qj border-l-4
+                  {% if tache.dateEcheance < today %}
+                    border-red-500 bg-gradient-to-r from-red-50 to-white
+                  {% elif tache.dateEcheance == today %}
+                    border-orange-500 bg-gradient-to-r from-orange-50 to-white
+                  {% elif tache.dateEcheance == demain %}
+                    border-yellow-500 bg-gradient-to-r from-yellow-50 to-white
+                  {% elif tache.dateEcheance <= dans_3_jours %}
+                    border-blue-500 bg-gradient-to-r from-blue-50 to-white
+                  {% else %}
+                    border-green-500 bg-gradient-to-r from-green-50 to-white
+                  {% endif %} hover:shadow-xl transition duration-300 transform hover:-translate-y-1">
+                  
+                  <div class="p-6">
+                    <div class="flex justify-between items-start">
+                      <!-- Numéro et catégorie d'urgence -->
+                      <div class="flex items-center">
+                        <div class="mr-4 relative">
+                          <!-- Numéro avec fond -->
+                          <div class="w-12 h-12 rounded-full flex items-center justify-center
+                            {% if tache.dateEcheance < today %}bg-red-500 text-white
+                            {% elif tache.dateEcheance == today %}bg-orange-500 text-white
+                            {% elif tache.dateEcheance == demain %}bg-yellow-500 text-black
+                            {% elif tache.dateEcheance <= dans_3_jours %}bg-blue-500 text-white
+                            {% else %}bg-green-500 text-white{% endif %}">
+                            <span class="ek yj zp or kk wm">
+                              {{ forloop.counter }}
+                            </span>
+                          </div>
+                          
+                          <!-- Badge URGENT pour retard/aujourd'hui/demain -->
+                          {% if tache.dateEcheance <= demain %}
+                            <div class="absolute -top-2 -right-2">
+                              <span class="ek xj 
+                                {% if tache.dateEcheance < today %}bg-red-600 text-white
+                                {% elif tache.dateEcheance == today %}bg-orange-600 text-white
+                                {% else %}bg-yellow-600 text-black{% endif %}
+                                px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                {% if tache.dateEcheance < today %}🚨 URGENT
+                                {% elif tache.dateEcheance == today %}⚡ URGENT
+                                {% else %}🕒 URGENT{% endif %}
+                              </span>
+                            </div>
+                          {% endif %}
+                        </div>
+                        
+                        <div class="flex-1">
+                          <h4 class="ek yj kk wm nb _b mb-2">{{ tache.titre }}</h4>
+                          
+                          <!-- Indicateurs -->
+                          <div class="flex flex-wrap gap-2 mb-3">
+                            <!-- Statut -->
+                            <span class="ek xj
+                              {% if tache.statut == 'EN_COURS' %}bg-blue-100 text-blue-800
+                              {% else %}bg-gray-100 text-gray-800{% endif %}
+                              px-3 py-1 rounded-full text-xs">
+                              {{ tache.get_statut_display }}
+                            </span>
+                            
+                            <!-- Catégorie d'urgence -->
+                    
+                            {% if tache.dateEcheance == today %}
+                              <span class="ek xj bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                 AUJOURD'HUI
+                              </span>
+                            {% elif tache.dateEcheance == demain %}
+                              <span class="ek xj bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                                🕒 DEMAIN
+                              </span>
+                            {% elif tache.dateEcheance <= dans_3_jours %}
+                              <span class="ek xj bg-blue-500 text-white px-3 py-1 rounded-full text-xs">
+                                📅 BIENTÔT ({{ tache.dateEcheance|timeuntil:today }})
+                              </span>
+                            {% endif %}
+                          </div>
+                          
+                          <!-- Date -->
+                          <div class="flex items-center">
+                            <span class="ek xj text-gray-600 bg-white px-3 py-1 rounded-full text-sm border inline-flex items-center">
+                              <span class="mr-2">📅</span>
+                              {{ tache.dateEcheance|date:"d/m/Y" }}
+                              {% if tache.dateEcheance < today %}
+                                <span class="ml-2 text-red-500 font-medium">
+                                  ({{ today|timeuntil:tache.dateEcheance }} de retard)
+                                </span>
+                              {% elif tache.dateEcheance == today %}
+                                <span class="ml-2 text-orange-500 font-medium">
+                                  (Dernier jour !)
+                                </span>
+                              {% elif tache.dateEcheance == demain %}
+                                <span class="ml-2 text-yellow-500 font-medium">
+                                  (À faire demain)
+                                </span>
+                              {% endif %}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Actions rapides -->
+                      <div class="text-right ml-4">
+                        <div class="flex flex-col items-end gap-3">
+                          <!-- Bouton terminer -->
+                          <a href="{% url 'Taches:tache_terminer' tache.pk %}" 
+                             class="ek rg bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm transition duration-300 inline-flex items-center shadow-md hover:shadow-lg">
+                            <span class="mr-2 text-lg">✅</span> 
+                            <span class="font-medium">Terminer</span>
+                          </a>
+                          
+                          <!-- Niveau de priorité -->
+                          <div class="text-center">
+                            <div class="ek xj
+                              {% if tache.dateEcheance < today %}bg-red-100 text-red-800 border border-red-300
+                              {% elif tache.dateEcheance == today %}bg-orange-100 text-orange-800 border border-orange-300
+                              {% elif tache.dateEcheance == demain %}bg-yellow-100 text-yellow-800 border border-yellow-300
+                              {% elif tache.dateEcheance <= dans_3_jours %}bg-blue-100 text-blue-800 border border-blue-300
+                              {% else %}bg-green-100 text-green-800 border border-green-300{% endif %}
+                              px-3 py-1 rounded-full text-xs font-medium">
+                              {% if tache.dateEcheance < today %}
+                                <span class="inline-flex items-center">
+                                  <span class="mr-1">🚨</span> CRITIQUE
+                                </span>
+                              {% elif tache.dateEcheance == today %}
+                                <span class="inline-flex items-center">
+                                  <span class="mr-1"></span> TRÈS URGENT
+                                </span>
+                              {% elif tache.dateEcheance == demain %}
+                                <span class="inline-flex items-center">
+                                  <span class="mr-1">🕒</span> URGENT
+                                </span>
+                              {% elif tache.dateEcheance <= dans_3_jours %}
+                                <span class="inline-flex items-center">
+                                  <span class="mr-1">📅</span> IMPORTANT
+                                </span>
+                              {% else %}
+                                <span class="inline-flex items-center">
+                                  <span class="mr-1">📋</span> NORMAL
+                                </span>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    {% if tache.description %}
+                      <div class="mt-4 pt-4 border-t border-gray-100">
+                        <p class="sc ak text-gray-700">{{ tache.description|truncatechars:200 }}</p>
+                      </div>
+                    {% endif %}
+                    
+                    <!-- Barre de progression (pour les tâches en cours) -->
+                    {% if tache.statut == 'EN_COURS' %}
+                      <div class="mt-4">
+                        <div class="flex justify-between items-center mb-1">
+                          <span class="ek xj text-gray-600 text-sm">Progression</span>
+                          <span class="ek xj text-blue-600 text-sm font-medium">En cours</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                          <div class="bg-blue-500 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-12 animate_top">
+          <div class="i pg sg vk xm bi qj">
+            <div class="p-8">
+              <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-3xl">🎉</span>
+              </div>
+              <h3 class="ek yj kk wm mb-2">Aucune tâche active !</h3>
+              <p class="sc ak mb-6">Vous n'avez aucune tâche en cours à prioriser.</p>
+              <div class="tc wf xg">
+                <a href="{% url 'Taches:tache_create' %}" class="ek rg lk gh ml il gi hi inline-flex items-center">
+                  <span class="mr-2">➕</span> Nouvelle tâche
+                </a>
+                <a href="{% url 'Taches:frontoffice' %}" class="ek rg lk yg ml il gi hi inline-flex items-center">
+                  <span class="mr-2">📋</span> Toutes les tâches
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Légende améliorée -->
+    <div class="animate_top mt-12">
+      <div class="i pg sg vk xm bi qj">
+        <div class="p-6">
+          <h4 class="ek yj kk wm mb-4"> Guide des priorités</h4>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg border border-red-200">
+              <div class="flex items-center mb-2">
+                
+              
+            </div>
+            
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+              <div class="flex items-center mb-2">
+                <div class="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center mr-2 text-xs">
+                  ⚡
+                </div>
+                <h5 class="ek yj kk text-orange-700 text-sm">AUJOURD'HUI</h5>
+              </div>
+              <p class="sc ak text-orange-600 text-xs">
+                Dernier jour - Très urgent
+              </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border border-yellow-200">
+              <div class="flex items-center mb-2">
+                <div class="w-6 h-6 bg-yellow-500 text-black rounded-full flex items-center justify-center mr-2 text-xs">
+                  🕒
+                </div>
+                <h5 class="ek yj kk text-yellow-700 text-sm">DEMAIN</h5>
+              </div>
+              <p class="sc ak text-yellow-600 text-xs">
+                À faire rapidement
+              </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+              <div class="flex items-center mb-2">
+                <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center mr-2 text-xs">
+                  📅
+                </div>
+                <h5 class="ek yj kk text-blue-700 text-sm">2-3 JOURS</h5>
+              </div>
+              <p class="sc ak text-blue-600 text-xs">
+                À planifier cette semaine
+              </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+              <div class="flex items-center mb-2">
+                <div class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center mr-2 text-xs">
+                  📆
+                </div>
+                <h5 class="ek yj kk text-green-700 text-sm">PLUS TARD</h5>
+              </div>
+              <p class="sc ak text-green-600 text-xs">
+                Peut attendre
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    
+
+    <!-- Bouton retour -->
+    <div class="text-center mt-12">
+              <a href="{% url 'Taches:project_taches' projet.id %}" 
+                class="ek rg bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md border border-gray-600 hover:border-gray-700 transition-all duration-300 w-full sm:w-auto text-center">
+                  <span class="flex items-center justify-center">
+                    ⬅️ Retour au tableau de bord
+                  </span>
+              </a>      
+
+
+    </div>
+  </div>
+</section>
+{% endblock %}

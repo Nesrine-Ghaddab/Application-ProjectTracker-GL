@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% if reunion %}Edit Meeting{% else %}Schedule Meeting{% endif %} | Personal Meeting Tracker</title>
+  {% load static %}
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link href="{% static 'base_tailwind/style.css' %}" rel="stylesheet">
+</head>
+
+<body
+  x-data="{ page: 'meetings', darkMode: true, stickyMenu: false, navigationOpen: false, scrollTop: false }"
+  x-init="
+    darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? true;
+    $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))
+  "
+  :class="{ 'b eh': darkMode === true }">
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+  <!-- ===== Header End ===== -->
+
+  <main>
+    <!-- ===== Meeting Form Start ===== -->
+    <section class="gj qp gr hj rp hr">
+      <div class="bb ze ki xn 2xl:ud-px-0">
+        <div class="tc sf yo zf kq">
+          <div class="ro">
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-10">
+              <div class="tc wf yf ap">
+                <h1 class="ek vj 2xl:ud-text-title-lg kk wm nb gb">
+                  {% if reunion %}Edit Meeting{% else %}Schedule New Meeting{% endif %}
+                </h1>
+                <a href="{% url 'reunion:list' %}" class="ek pk xl">Back to Meetings</a>
+              </div>
+
+              <!-- wider form wrapper -->
+              <form method="post" class="tc wf rn un gg ap">
+                {% csrf_token %}
+
+                <div class="tc wf uf cg">
+                  <!-- Title -->
+                  <div class="vd wf">
+                    <label for="title" class="ek kk wm db pb">Meeting Title *</label>
+                    <input type="text" id="title" name="title" value="{{ reunion.title|default:'' }}"
+                           class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                           style="max-width: 40rem; padding: 0.9rem 1rem; font-size: 0.98rem;"
+                           required
+                           placeholder="Enter meeting title">
+                  </div>
+
+                  <!-- Date + Time row -->
+                  <div class="tc wf sf rn un gg">
+                    <div class="vd wo/3">
+                      <label for="date" class="ek kk wm db pb">Date *</label>
+                      <input type="date" id="date" name="date" value="{{ reunion.date|default:'' }}"
+                             class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                             style="padding: 0.8rem 1rem; font-size: 0.95rem;"
+                             required>
+                    </div>
+
+                    <div class="vd wo/3">
+                      <label for="start_time" class="ek kk wm db pb">Start Time *</label>
+                      <input type="time" id="start_time" name="start_time" value="{{ reunion.start_time|default:'' }}"
+                             class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                             style="padding: 0.8rem 1rem; font-size: 0.95rem;"
+                             required>
+                    </div>
+
+                    <div class="vd wo/3">
+                      <label for="end_time" class="ek kk wm db pb">End Time *</label>
+                      <input type="time" id="end_time" name="end_time" value="{{ reunion.end_time|default:'' }}"
+                             class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                             style="padding: 0.8rem 1rem; font-size: 0.95rem;"
+                             required>
+                    </div>
+                  </div>
+
+                  <!-- Type + Subject row -->
+                  <div class="tc wf sf rn un gg">
+                    <div class="vd wo/2">
+                      <label for="reunion_type" class="ek kk wm db pb">Meeting Type *</label>
+                      <select id="reunion_type" name="reunion_type"
+                              class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                              style="padding: 0.8rem 1rem; font-size: 0.95rem;"
+                              required>
+                        <option value="">Select meeting type...</option>
+                        <option value="education" {% if reunion.reunion_type == "education" %}selected{% endif %}>Education Course</option>
+                        <option value="project" {% if reunion.reunion_type == "project" %}selected{% endif %}>Project Meeting</option>
+                        <option value="revision" {% if reunion.reunion_type == "revision" %}selected{% endif %}>Revision with Classmates</option>
+                        <option value="other" {% if reunion.reunion_type == "other" %}selected{% endif %}>Other</option>
+                      </select>
+                    </div>
+
+                    <div class="vd wo/2">
+                      <label for="subject" class="ek kk wm db pb">Subject *</label>
+                      <select id="subject" name="subject"
+                              class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                              style="padding: 0.8rem 1rem; font-size: 0.95rem;"
+                              required>
+                        <option value="">Select subject...</option>
+                        <option value="math" {% if reunion.subject == "math" %}selected{% endif %}>Mathematics</option>
+                        <option value="physics" {% if reunion.subject == "physics" %}selected{% endif %}>Physics</option>
+                        <option value="computer_science" {% if reunion.subject == "computer_science" %}selected{% endif %}>Computer Science</option>
+                        <option value="biology" {% if reunion.subject == "biology" %}selected{% endif %}>Biology</option>
+                        <option value="chemistry" {% if reunion.subject == "chemistry" %}selected{% endif %}>Chemistry</option>
+                        <option value="literature" {% if reunion.subject == "literature" %}selected{% endif %}>Literature</option>
+                        <option value="history" {% if reunion.subject == "history" %}selected{% endif %}>History</option>
+                        <option value="other" {% if reunion.subject == "other" %}selected{% endif %}>Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Description (taller and wider) -->
+                  <div class="vd wf">
+                    <label for="description" class="ek kk wm db pb">Description</label>
+                    <textarea id="description" name="description" rows="5"
+                              class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                              style="max-width: 42rem; padding: 0.9rem 1rem; font-size: 0.96rem;"
+                              placeholder="Enter meeting description (optional)">{{ reunion.description|default:'' }}</textarea>
+                  </div>
+
+                  <!-- Reminder row -->
+                  <div class="tc wf sf rn un gg">
+                    <div class="vd wo/2">
+                      <label class="ek kk wm db pb">Reminder</label>
+                      <div class="tc wf cg">
+                        <label class="tc wf cg">
+                          <input type="checkbox" name="reminder_enabled"
+                                 {% if reunion.reminder_enabled or not reunion %}checked{% endif %}
+                                 class="mr-2">
+                          Enable reminder for this meeting
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="vd wo/2">
+                      <label for="reminder_timing" class="ek kk wm db pb">Reminder Timing</label>
+                      <select id="reminder_timing" name="reminder_timing"
+                              class="vd wf sm _g ch pm vk xm rg gm dm/40 dn/40"
+                              style="padding: 0.8rem 1rem; font-size: 0.95rem;">
+                        <option value="5" {% if reunion.reminder_timing == 5 %}selected{% endif %}>5 minutes before</option>
+                        <option value="15" {% if reunion.reminder_timing == 15 %}selected{% endif %}>15 minutes before</option>
+                        <option value="30" {% if reunion.reminder_timing == 30 %}selected{% endif %}>30 minutes before</option>
+                        <option value="60" {% if reunion.reminder_timing == 60 %}selected{% endif %}>1 hour before</option>
+                        <option value="120" {% if reunion.reminder_timing == 120 %}selected{% endif %}>2 hours before</option>
+                        <option value="1440" {% if reunion.reminder_timing == 1440 %}selected{% endif %}>1 day before</option>
+                        <option value="2880" {% if reunion.reminder_timing == 2880 %}selected{% endif %}>2 days before</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="tc wf cg ap nb">
+                  <button type="submit" class="lk gh dk rg tc wf xf _l gi hi">
+                    {% if reunion %}Update Meeting{% else %}Schedule Meeting{% endif %}
+                  </button>
+                  <a href="{% url 'reunion:list' %}" class="ek pk xl rg gi hi">Cancel</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ===== Meeting Form End ===== -->
+  </main>
+
+  <!-- ===== Footer Start ===== -->
+  <footer>
+    <div class="bb ze ki xn 2xl:ud-px-0">
+      <div class="ji gp">
+        <div class="tc uf ap gg fp">
+          <div class="animate_top zd/2 to/4">
+            <a href="{% url 'reunion:list' %}">
+              <img src="{% static 'base_tailwind/images/logo-light.svg' %}" alt="Logo" class="om" />
+              <img src="{% static 'base_tailwind/images/logo-dark.svg' %}" alt="Logo" class="xc nm" />
+            </a>
+            <p class="lc fb">Streamline your workflow with our productivity tools.</p>
+            <ul class="tc wf cg">
+              <li><a href="#!" class="xl">Facebook</a></li>
+              <li><a href="#!" class="xl">Twitter</a></li>
+              <li><a href="#!" class="xl">LinkedIn</a></li>
+            </ul>
+          </div>
+
+          <div class="vd ro tc sf rn un gg vn">
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Quick Links</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Home</a></li>
+                <li><a href="#!" class="sc xl vb">Product</a></li>
+                <li><a href="#!" class="sc xl vb">Careers</a></li>
+                <li><a href="#!" class="sc xl vb">Pricing</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Services</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Web Development</a></li>
+                <li><a href="#!" class="sc xl vb">Graphics Design</a></li>
+                <li><a href="#!" class="sc xl vb">Digital Marketing</a></li>
+                <li><a href="#!" class="sc xl vb">Ui/Ux Design</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Support</h4>
+              <ul>
+                <li><a href="#!" class="sc xl vb">Company</a></li>
+                <li><a href="#!" class="sc xl vb">Press media</a></li>
+                <li><a href="#!" class="sc xl vb">Our Blog</a></li>
+                <li><a href="#!" class="sc xl vb">Contact Us</a></li>
+              </ul>
+            </div>
+
+            <div class="animate_top">
+              <h4 class="kk wm tj ec">Newsletter</h4>
+              <p class="ac qe">Subscribe to receive future updates</p>
+              <form action="#">
+                <div class="i">
+                  <input type="text" placeholder="Email address" class="vd sm _g ch pm vk xm rg gm dm dn gi mi" />
+                  <button class="h q fi">
+                    Subscribe
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bh ch pm tc uf sf yo wf xf ap cg fp bj">
+        <div class="animate_top">
+          <ul class="tc wf gg">
+            <li><a href="#!" class="xl">English</a></li>
+            <li><a href="#!" class="xl">Privacy Policy</a></li>
+            <li><a href="#!" class="xl">Support</a></li>
+          </ul>
+        </div>
+        <div class="animate_top">
+          <p>&copy; 2025 Personal Meeting Tracker. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== Footer End ===== -->
+
+  <button class="xc wf xf ie ld vg sr gh tr g sa ta _a"
+          @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+          @scroll.window="scrollTop = (window.pageYOffset > 50)"
+          :class="{ 'uc' : scrollTop }">
+    <svg class="uh se qd" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <path
+        d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8-12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+    </svg>
+  </button>
+
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+</body>
+</html>

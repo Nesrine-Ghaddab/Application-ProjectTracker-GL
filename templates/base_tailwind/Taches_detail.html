@@ -1,0 +1,199 @@
+{% extends 'base_tailwind/base_taches.html' %}
+{% load static %}
+
+{% block title %}Détail de la tâche - {{ tache.titre }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gj do ir hj sp jr i pg">
+  <div class="bb ze ki xn 2xl:ud-px-0">
+    <div class="tc _o">
+      <div class="animate_left jn/2">
+        <h1 class="fk vj zp or kk wm wb">📌 Détail de la tâche</h1>
+        <p class="fq">
+          Consultez les informations complètes de votre tâche et gérez son statut.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section détail de la tâche -->
+<section class="ji gp uq pg">
+  <div class="bb ze ki xn wq">
+    <div class="max-w-4xl mx-auto animate_top">
+      <div class="i pg sg vk xm bi qj border-l-4 
+        {% if tache.statut == 'TERMINE' and tache.resultat == 'SUCCES' %} border-green-500
+        {% elif tache.statut == 'TERMINE' and tache.resultat == 'ECHEC' %} border-red-500
+        {% elif tache.statut == 'EN_COURS' %} border-yellow-500
+        {% else %} border-gray-400
+        {% endif %}">
+        
+        <div class="p-8">
+          <!-- En-tête avec titre -->
+          <div class="flex justify-between items-start mb-6">
+            <h2 class="fk vj kk wm nb _b">{{ tache.titre }}</h2>
+            <!-- Badge de statut -->
+            <div class="flex-shrink-0 ml-4">
+              {% if tache.statut == "TERMINE" %}
+                {% if tache.resultat == "SUCCES" %}
+                  <span class="ek rg bg-green-500 text-white px-3 py-1 rounded-full text-sm">
+                    ✅ Terminée avec succès
+                  </span>
+                {% else %}
+                  <span class="ek rg bg-red-500 text-white px-3 py-1 rounded-full text-sm">
+                    ❌ Terminée (échec)
+                  </span>
+                {% endif %}
+              {% elif tache.statut == "EN_COURS" %}
+                <span class="ek rg bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
+                  ⏳ En cours
+                </span>
+              {% else %}
+                <span class="ek rg bg-gray-500 text-white px-3 py-1 rounded-full text-sm">
+                  📝 À faire
+                </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Informations de la tâche -->
+          <div class="space-y-6">
+            <!-- Description -->
+            <div>
+              <h3 class="ek yj kk wm nb _b mb-2">📋 Description</h3>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="sc ak leading-relaxed">{{ tache.description|linebreaksbr }}</p>
+              </div>
+            </div>
+
+            <!-- Date d'échéance -->
+            <div>
+              <h3 class="ek yj kk wm nb _b mb-2">⏰ Date d'échéance</h3>
+              <div class="flex items-center">
+                {% if tache.dateEcheance < today and tache.statut != 'TERMINE' %}
+                  <span class="ek xj text-red-500 bg-red-50 px-3 py-2 rounded-lg border border-red-200">
+                    {{ tache.dateEcheance }} (Échéance dépassée)
+                  </span>
+                {% else %}
+                  <span class="ek xj text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                    {{ tache.dateEcheance }}
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Métadonnées -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 class="ek yj kk wm nb _b mb-2">📊 Statut</h3>
+                <p class="sc ak">{{ tache.get_statut_display }}</p>
+              </div>
+              
+              {% if tache.resultat %}
+              <div>
+                <h3 class="ek yj kk wm nb _b mb-2">🎯 Résultat</h3>
+                <p class="sc ak">{{ tache.get_resultat_display }}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 mt-8 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {% if tache.statut == "TERMINE" %}
+                <button class="ek rg bg-gray-400 text-white px-6 py-3 rounded-md border border-gray-500 cursor-not-allowed w-full sm:w-auto" disabled>
+                  <span class="flex items-center justify-center">
+                    ✏️ Modifier (désactivé)
+                  </span>
+                </button>
+              {% else %}
+                <a href="{% url 'Taches:tache_update' tache.pk %}" class="ek rg bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-md border border-yellow-600 hover:border-yellow-700 transition-all duration-300 w-full sm:w-auto text-center">
+                  <span class="flex items-center justify-center">
+                    ✏️ Modifier
+                  </span>
+                </a>
+              {% endif %}
+
+              <a href="{% url 'Taches:tache_delete' tache.pk %}" class="ek rg bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-md border border-red-600 hover:border-red-700 transition-all duration-300 w-full sm:w-auto text-center">
+                <span class="flex items-center justify-center">
+                  🗑️ Supprimer
+                </span>
+              </a>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {% if tache.statut != "TERMINE" %}
+                <a href="{% url 'Taches:tache_terminer' tache.pk %}" class="ek rg bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md border border-green-600 hover:border-green-700 transition-all duration-300 w-full sm:w-auto text-center">
+                  <span class="flex items-center justify-center">
+                    ✔️ Marquer comme terminée
+                  </span>
+                </a>
+              {% endif %}
+              
+              <a href="{% url 'Taches:project_taches' projet.id %}" 
+                class="ek rg bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md border border-gray-600 hover:border-gray-700 transition-all duration-300 w-full sm:w-auto text-center">
+                  <span class="flex items-center justify-center">
+                    ⬅️ Retour au tableau de bord
+                  </span>
+              </a>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section informations supplémentaires -->
+<section class="ji gp uq">
+  <div class="bb ze ki xn wq">
+    <div class="max-w-4xl mx-auto animate_top">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Carte Statut -->
+        <div class="i pg sg vk xm bi qj text-center">
+          <div class="p-6">
+            <div class="text-3xl mb-2">
+              {% if tache.statut == "TERMINE" %}✅
+              {% elif tache.statut == "EN_COURS" %}⏳
+              {% else %}📝{% endif %}
+            </div>
+            <h4 class="ek yj kk wm mb-1">Statut</h4>
+            <p class="sc ak">{{ tache.get_statut_display }}</p>
+          </div>
+        </div>
+
+        <!-- Carte Échéance -->
+        <div class="i pg sg vk xm bi qj text-center">
+          <div class="p-6">
+            <div class="text-3xl mb-2">⏰</div>
+            <h4 class="ek yj kk wm mb-1">Échéance</h4>
+            <p class="sc ak {% if tache.dateEcheance < today and tache.statut != 'TERMINE' %}text-red-500{% endif %}">
+              {{ tache.dateEcheance }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Carte Résultat -->
+        <div class="i pg sg vk xm bi qj text-center">
+          <div class="p-6">
+            <div class="text-3xl mb-2">
+              {% if tache.resultat == "SUCCES" %}🎯
+              {% elif tache.resultat == "ECHEC" %}❌
+              {% else %}➖{% endif %}
+            </div>
+            <h4 class="ek yj kk wm mb-1">Résultat</h4>
+            <p class="sc ak">
+              {% if tache.resultat %}{{ tache.get_resultat_display }}
+              {% else %}Non défini{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

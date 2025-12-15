@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px; }
+        .content { padding: 20px; border: 1px solid #ddd; margin-top: 10px; border-radius: 5px; }
+        .field { margin: 10px 0; }
+        .label { font-weight: bold; color: #4CAF50; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Reunion Scheduled</h1>
+        </div>
+        <div class="content">
+            <div class="field">
+                <span class="label">Title:</span> {{ reunion.title }}
+            </div>
+            <div class="field">
+                <span class="label">Date:</span> {{ reunion.date }}
+            </div>
+            <div class="field">
+                <span class="label">Start Time:</span> {{ reunion.start_time }}
+            </div>
+            <div class="field">
+                <span class="label">End Time:</span> {{ reunion.end_time }}
+            </div>
+            <div class="field">
+                <span class="label">Type:</span> {{ reunion.get_reunion_type_display }}
+            </div>
+            <div class="field">
+                <span class="label">Subject:</span> {{ reunion.get_subject_display }}
+            </div>
+            {% if reunion.description %}
+            <div class="field">
+                <span class="label">Description:</span><br>
+                {{ reunion.description }}
+            </div>
+            {% endif %}
+            <p style="margin-top: 30px; color: #999;">Best regards,<br>{{ site_name }}</p>
+        </div>
+    </div>
+</body>
+</html>
