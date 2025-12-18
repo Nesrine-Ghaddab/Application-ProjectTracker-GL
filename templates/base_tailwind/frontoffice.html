@@ -1,0 +1,407 @@
+{% extends 'base_tailwind/base_taches.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord - Mes tâches{% endblock %}
+
+{% block content %}
+
+{% if tache_rappel_principale and not notification_fermee %}
+<div id="notificationRappel" class="fixed top-4 right-4 z-50 max-w-xs w-full">
+  <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow-xl border border-blue-400 animate-slideInRight">
+    
+    <!-- En-tête compacte -->
+    <div class="p-3">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center">
+          <!-- Icône petite -->
+          <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-2">
+            {% if pourcentage_temps >= 80 %}
+              <span class="text-sm">🚨</span>
+            {% elif pourcentage_temps >= 50 %}
+              <span class="text-sm">⚠️</span>
+            {% else %}
+              <span class="text-sm">⏰</span>
+            {% endif %}
+          </div>
+          
+          <!-- Titre court -->
+          <div>
+            <h5 class="ek yj kk text-white text-sm font-bold">
+              {% if tache_rappel_principale.dateEcheance == today %}AUJOURD'HUI
+              {% elif tache_rappel_principale.dateEcheance == demain %}DEMAIN
+              {% else %}RAPPEL
+              {% endif %}
+            </h5>
+          </div>
+        </div>
+        
+        <!-- Bouton fermer petit -->
+        <form method="post" action="{% url 'Taches:frontoffice' %}" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="fermer_notification" value="1">
+          <button type="submit" 
+                  class="text-white/80 hover:text-white text-xs transition duration-200"
+                  title="Fermer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+      
+      <!-- Nom de la tâche -->
+      <p class="sc ak text-white/90 text-xs mb-2 truncate">
+        {{ tache_rappel_principale.titre|truncatechars:40 }}
+      </p>
+    </div>
+    
+    <!-- BARRE DE PROGRESSION COMPACTE -->
+    <div class="px-3 pb-3">
+      <!-- Barre de progression simple -->
+      <div class="w-full bg-white/20 rounded-full h-1.5 mb-1 overflow-hidden">
+        <div class="h-1.5 rounded-full transition-all duration-300 ease-out
+          {% if pourcentage_temps >= 80 %}bg-red-400
+          {% elif pourcentage_temps >= 60 %}bg-orange-400
+          {% elif pourcentage_temps >= 40 %}bg-yellow-400
+          {% else %}bg-green-400{% endif %}"
+             style="width: {{ pourcentage_temps }}%">
+        </div>
+      </div>
+      
+      <!-- Infos ligne unique -->
+      <div class="flex justify-between items-center">
+        <span class="sc ak text-white/80 text-xs">
+          📅 {{ tache_rappel_principale.dateEcheance|date:"d/m" }}
+        </span>
+        
+        <!-- Bouton Fermer la notification -->
+       <form method="post" action="{% url 'Taches:project_taches' projet.id %}" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="fermer_notification" value="1">
+          <button type="submit" 
+                  class="ek rg bg-white/20 hover:bg-white/30 text-white text-xs px-2 py-1 rounded transition duration-200">
+              Fermer
+          </button>
+      </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles d'animation -->
+<style>
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes gentlePulse {
+    0%, 100% {
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+    }
+  }
+  
+  .animate-slideInRight {
+    animation: slideInRight 0.4s ease-out forwards;
+  }
+  
+  #notificationRappel > div {
+    animation: gentlePulse 3s infinite;
+  }
+</style>
+{% endif %}
+
+<!-- Hero Section pour le tableau de bord -->
+<section class="gj do ir hj sp jr i pg">
+  <div class="bb ze ki xn 2xl:ud-px-0">
+    <div class="tc _o">
+      <div class="animate_left jn/2">
+        <h1 class="fk vj zp or kk wm wb">📌 Tableau de bord des tâches</h1>
+        <p class="fq">
+          Gérez toutes vos tâches. Les tâches urgentes non terminées sont mises en évidence.
+        </p>
+        
+        <!-- Petite indication si notification fermée -->
+        {% if notification_fermee and tache_rappel_principale %}
+          <div class="mt-4 inline-block">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 inline-flex items-center">
+              <span class="text-blue-500 mr-2">ℹ️</span>
+              <div>
+                <span class="sc ak text-blue-700 text-sm">
+                  Rappel masqué pour aujourd'hui. 
+                  <a href="{% url 'Taches:tache_detail' tache_rappel_principale.pk %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                    {{ tache_rappel_principale.titre|truncatechars:30 }}
+                  </a>
+                  arrive à échéance 
+                  {% if tache_rappel_principale.dateEcheance == today %}aujourd'hui
+                  {% else %}le {{ tache_rappel_principale.dateEcheance|date:"d/m" }}{% endif %}.
+                </span>
+                
+                <!-- Bouton pour réafficher la notification -->
+                <form method="post" action="{% url 'Taches:project_taches' projet.id %}" class="inline ml-3">
+                  {% csrf_token %}
+                  <input type="hidden" name="reafficher_notification" value="1">
+                  <button type="submit" 
+                          class="ek rg bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-xs transition duration-300 ml-2">
+                      Afficher la notification
+                  </button>
+              </form>
+
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section principale des tâches -->
+<section class="ji gp uq pg">
+  <div class="bb ze ki xn wq">
+    
+    <!-- Boutons d'actions -->
+    <div class="text-center mb-10">
+      <div class="inline-flex flex-col sm:flex-row items-center gap-4 p-6 bg-gradient-to-r from-gray-50 to-white rounded-2xl shadow-sm">
+        <div class="text-center sm:text-left mb-4 sm:mb-0 sm:mr-8">
+          <h5 class="ek yj zp or kk wm mb-1">Actions rapides</h5>
+          <p class="sc ak text-gray-500 text-sm"></p>
+        </div>
+        
+        <div class="flex flex-wrap gap-3">
+
+    
+
+    <!-- Bouton Prioriser -->
+    <a href="{% url 'Taches:priorisation' projet.id %}"
+      class="inline-flex items-center px-5 py-2.5 rounded-full border border-orange-200 bg-orange-50 text-black hover:bg-orange-100 hover:border-orange-300 transition duration-300">
+        <span class="mr-2">🎯</span>
+        <span class="font-medium text-black">Prioriser</span>
+    </a>
+    <a href="{% url 'Taches:tache_create' projet.id %}" 
+        class="ek rg bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300 inline-flex items-center">
+          <span class="mr-2">➕</span> Ajouter une tâche
+    </a>
+    <a href="{% url 'projects:project_detail' projet.id %}" 
+        class="ek rg bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300 inline-flex items-center">
+          <span class="mr-2">⬅️</span> Retour au projet
+    </a>
+
+
+</div>
+
+      </div>
+    </div>
+
+    <!-- Section Tâches urgentes (non terminées) -->
+    {% with taches_urgentes=taches|dictsort:"dateEcheance" %}
+      {% with urgent_count=0 %}
+        {% for tache in taches_urgentes %}
+          {% if tache.statut != 'TERMINE' and tache.dateEcheance <= today|add:'3 days' %}
+            {% if forloop.first %}
+              <div class="animate_top mb-8">
+                <div class="flex items-center mb-4">
+                  <div class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-3">
+                    <span>🔥</span>
+                  </div>
+                  <h3 class="ek yj zp or kk wm wb">Tâches urgentes à traiter</h3>
+                  <span class="ek rg bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm ml-3">
+                    {{ taches_urgentes|length }} urgent{{ taches_urgentes|length|pluralize:"e,es" }}
+                  </span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% endif %}
+            
+            <!-- Carte tâche urgente -->
+            <div class="animate_top">
+              <a href="{% url 'Taches:tache_detail' tache.pk %}" class="text-decoration-none block hover:no-underline">
+                <div class="i pg sg vk xm bi qj border-l-4 border-red-500 bg-red-50 hover:shadow-md transition duration-300">
+                  <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                      <h4 class="ek yj kk wm nb _b">{{ tache.titre }}</h4>
+                      <span class="ek xj bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                        {% if tache.dateEcheance < today %}EN RETARD
+                        {% elif tache.dateEcheance == today %}AUJOURD'HUI
+                        {% else %}URGENT
+                        {% endif %}
+                      </span>
+                    </div>
+                    
+                    <p class="sc ak text-gray-600 mb-3">{{ tache.description|truncatechars:100 }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                      <div class="flex items-center">
+                        <span class="ek xj text-gray-600 bg-white px-2 py-1 rounded-full text-xs border mr-2">
+                          📅 {{ tache.dateEcheance|date:"d/m/Y" }}
+                        </span>
+                        <span class="ek xj 
+                          {% if tache.statut == 'EN_COURS' %}bg-green-100 text-green-800
+                          {% else %}bg-gray-100 text-gray-800{% endif %}
+                          px-2 py-1 rounded-full text-xs">
+                          {{ tache.get_statut_display }}
+                        </span>
+                      </div>
+                      
+                      <div class="flex gap-2">
+                        <a href="{% url 'Taches:tache_detail' tache.pk %}" 
+                           class="ek rg text-blue-600 hover:text-blue-800 text-sm">
+                          Détails
+                        </a>
+                        <a href="{% url 'Taches:tache_terminer' tache.pk %}" 
+                          class="ek rg bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm">
+                          Terminer
+                        </a>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            
+            {% if forloop.last %}
+                </div>
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endwith %}
+    {% endwith %}
+
+    <!-- Toutes les tâches -->
+    <div class="animate_top">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="ek yj zp or kk wm wb">📋 Toutes les tâches</h3>
+          
+        </div>
+        <span class="ek rg bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+          {{ taches|length }} tâche{{ taches|length|pluralize }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for tache in taches %}
+          <div class="animate_top" style="animation-delay: {{ forloop.counter|add:"-1" }}00ms">
+            <a href="{% url 'Taches:tache_detail' tache.pk %}" class="text-decoration-none block hover:no-underline">
+              <div class="i pg sg vk xm bi qj h-full border hover:shadow-md transition duration-300
+                {% if tache.statut == 'TERMINE' %}border-green-200 bg-green-50
+                {% elif tache.dateEcheance <= today|add:'3 days' %}border-orange-200 bg-orange-50
+                {% else %}border-gray-200{% endif %}">
+                
+                <div class="p-5 h-full flex flex-col">
+                  <!-- Statut -->
+                  <div class="flex justify-between items-start mb-3">
+                    <span class="ek xj
+                      {% if tache.statut == 'TERMINE' %}
+                        {% if tache.resultat == 'SUCCES' %}bg-green-100 text-green-800
+                        {% else %}bg-red-100 text-red-800{% endif %}
+                      {% elif tache.statut == 'EN_COURS' %}bg-blue-100 text-blue-800
+                      {% else %}bg-gray-100 text-gray-800{% endif %}
+                      px-2 py-1 rounded-full text-xs">
+                      {{ tache.get_statut_display }}
+                    </span>
+                    
+                    {% if tache.statut != 'TERMINE' and tache.dateEcheance <= today|add:'3 days' %}
+                      <span class="ek xj bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
+                        ⚡
+                      </span>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Titre -->
+                  <h4 class="ek yj kk wm nb _b mb-3 flex-1">{{ tache.titre }}</h4>
+                  
+                  <!-- Description -->
+                  {% if tache.description %}
+                    <div class="mb-4 flex-1">
+                      <p class="sc ak text-gray-600 text-sm">{{ tache.description|truncatechars:80 }}</p>
+                    </div>
+                  {% endif %}
+                  
+                  <!-- Date -->
+                  <div class="mb-4">
+                    <div class="flex items-center justify-between">
+                      <span class="ek xj text-gray-600 bg-white px-2 py-1 rounded-full text-xs border">
+                        📅 {{ tache.dateEcheance|date:"d/m/Y" }}
+                      </span>
+                      
+                      {% if tache.dateEcheance < today and tache.statut != 'TERMINE' %}
+                        <span class="ek xj bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
+                          ⏰ Retard
+                        </span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  <!-- Actions -->
+                  <div class="mt-auto pt-3 border-t border-gray-100">
+                    <div class="flex justify-between items-center">
+                      
+                      
+                      {% if tache.statut != 'TERMINE' %}
+                        <a href="{% url 'Taches:tache_terminer' tache.pk %}" 
+                           class="ek rg bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm">
+                          ✔️ Terminer
+                        </a>
+                      {% else %}
+                        <span class="ek rg text-sm
+                          {% if tache.resultat == 'SUCCES' %}text-green-600
+                          {% else %}text-red-600{% endif %}">
+                          {% if tache.resultat == 'SUCCES' %}✅ Réussi
+                          {% else %}❌ Échoué{% endif %}
+                        </span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% empty %}
+          <div class="col-span-full text-center py-12 animate_top">
+            <div class="i pg sg vk xm bi qj">
+              <div class="p-8">
+                <div class="w-16 h-16 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-2xl">📝</span>
+                </div>
+                <h3 class="ek yj kk wm mb-2">Aucune tâche</h3>
+                <p class="sc ak mb-4">Commencez par créer votre première tâche !</p>
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    
+
+  </div>
+</section>
+{% endblock %}

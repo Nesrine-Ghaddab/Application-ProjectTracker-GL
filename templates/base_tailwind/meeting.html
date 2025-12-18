@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meetings | Personal Meeting Tracker</title>
+  {% load static %}
+  <link rel="icon" href="{% static 'base_tailwind/favicon.ico' %}">
+  <link href="{% static 'base_tailwind/style.css' %}" rel="stylesheet">
+  <style>
+    .flip-card {
+      background-color: transparent;
+      perspective: 1000px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .flip-card-front, .flip-card-back {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+    
+    .flip-card-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transform: rotateY(180deg);
+    }
+
+    .meeting-card-wrapper {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+*
+    .meeting-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 80px;
+    }
+  </style>
+</head>
+
+<body
+  x-data="{ page: 'meetings', darkMode: true, stickyMenu: false, navigationOpen: false, scrollTop: false }"
+  x-init="
+    darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? true;
+    $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))
+  "
+  :class="{ 'b eh': darkMode === true }">
+
+  <!-- ===== Header Start ===== -->
+  {% include 'base_tailwind/header.html' %}
+  <!-- ===== Header End ===== -->
+
+  <main>
+    <!-- ===== Meetings Start ===== -->
+    <section class="gj qp gr hj rp hr">
+      <div class="bb ze ki xn 2xl:ud-px-0">
+        <div class="tc sf yo zf kq">
+          <!-- main column -->
+          <div class="ro">
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-7.5 md:p-10">
+              <div class="tc wf yf ap">
+                <h1 class="ek vj 2xl:ud-text-title-lg kk wm nb gb">All Meetings</h1>
+                <a href="{% url 'reunion:create' %}" class="btn2">
+                  Schedule New Meeting
+                </a>
+              </div>
+
+              <!-- Meetings Filter (static UI for now) -->
+              <div class="tc wf yf ap qb">
+                <form method="get" class="tc wf">
+                  <div class="input-container">
+                    <input type="text" name="search" class="input" placeholder="Search meetings..."
+                           value="{{ search_query }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" class="icon">
+                      <g stroke-width="0" id="SVGRepo_bgCarrier"></g>
+                      <g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g>
+                      <g id="SVGRepo_iconCarrier">
+                        <rect fill="white" height="24" width="24"></rect>
+                        <path fill="" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM9 11.5C9 10.1193 10.1193 9 11.5 9C12.8807 9 14 10.1193 14 11.5C14 12.8807 12.8807 14 11.5 14C10.1193 14 9 12.8807 9 11.5ZM11.5 7C9.01472 7 7 9.01472 7 11.5C7 13.9853 9.01472 16 11.5 16C12.3805 16 13.202 15.7471 13.8957 15.31L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L15.31 13.8957C15.7471 13.202 16 12.3805 16 11.5C16 9.01472 13.9853 7 11.5 7Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                      </g>
+                    </svg>
+                  </div>
+                </form>
+
+                <div class="tc wf cg">
+                  <a href="{% url 'reunion:list' %}?filter=all" 
+                     class="{% if current_filter == 'all' or current_filter == '' %}lk gh dk rg tc wf xf _l gi hi{% else %}ek pk xl{% endif %}">
+                    All
+                  </a>
+                  <a href="{% url 'reunion:list' %}?filter=upcoming" 
+                     class="{% if current_filter == 'upcoming' %}lk gh dk rg tc wf xf _l gi hi{% else %}ek pk xl{% endif %}">
+                    Upcoming
+                  </a>
+                  <a href="{% url 'reunion:list' %}?filter=past" 
+                     class="{% if current_filter == 'past' %}lk gh dk rg tc wf xf _l gi hi{% else %}ek pk xl{% endif %}">
+                    Past
+                  </a>
+                </div>
+              </div>
+
+              <!-- Meetings List -->
+              <div class="qb">
+                {% for reunion in reunions %}
+                <div class="meeting-card-wrapper">
+                  <div class="flip-card" style="flex: 1;">
+                    <div class="flip-card-inner">
+                      <!-- FRONT - Title and Status Only -->
+                      <div class="flip-card-front tc wf yf ap qb pn cb rounded-md border border-stroke dark:border-strokedark bg-white dark:bg-blacksection shadow-solid-13 p-6">
+                        <div>
+                          <h3 class="wj kk wm xl mb-2">{{ reunion.title }}</h3>
+                          <span class="px-3 py-1 rounded-full text-sm font-medium
+                                       {% if reunion.is_upcoming %}
+                                         bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200
+                                       {% else %}
+                                         bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200
+                                       {% endif %}">
+                            {% if reunion.is_upcoming %}Upcoming{% else %}Past{% endif %}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- BACK - All Details -->
+                      <div class="flip-card-back rounded-md border border-stroke dark:border-strokedark bg-white dark:bg-blacksection shadow-solid-13 p-6">
+                        <div class="tc sf" style="gap: 0.5rem;">
+                          <p class="sc"><strong>Date:</strong> {{ reunion.date }}</p>
+                          <p class="sc"><strong>Time:</strong> {{ reunion.start_time }} – {{ reunion.end_time }}</p>
+                          <p class="sc"><strong>Type:</strong> {{ reunion.get_reunion_type_display }}</p>
+                          <p class="sc"><strong>Subject:</strong> {{ reunion.get_subject_display }}</p>
+                          
+                          <p class="sc">
+                            <strong>Reminder:</strong>
+                            {% if reunion.reminder_enabled %}
+                              <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+                                           {% if reunion.reminder_sent %}
+                                             bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200
+                                           {% elif reunion.needs_reminder %}
+                                             bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200
+                                           {% else %}
+                                             bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-200
+                                           {% endif %}">
+                                {{ reunion.get_reminder_timing_display }}
+                                {% if reunion.reminder_sent %}
+                                  · sent
+                                {% elif reunion.needs_reminder %}
+                                  · due now
+                                {% else %}
+                                  · scheduled
+                                {% endif %}
+                              </span>
+                            {% else %}
+                              <span class="lk kh dk rg si ti">Disabled</span>
+                            {% endif %}
+                          </p>
+                          
+                          {% if reunion.description %}
+                            <p class="sc mt-2"><strong>Description:</strong> {{ reunion.description }}</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons Outside Card -->
+                  <div class="meeting-actions">
+                    <a href="{% url 'reunion:update' reunion.pk %}" class="lk oh dk rg gi hi text-center" style="padding: 0.5rem 1rem; white-space: nowrap;">
+                      Edit
+                    </a>
+                    <a href="{% url 'reunion:delete' reunion.pk %}" class="lk kh dk rg gi hi text-center" style="padding: 0.5rem 1rem; white-space: nowrap;">
+                      Delete
+                    </a>
+                  </div>
+                </div>
+                {% empty %}
+                <div class="tc wf cg ap qb pn dg cb rounded-md border border-stroke dark:border-strokedark p-5">
+                  <div class="tc">
+                    <h3 class="wj kk wm xl">No meetings scheduled yet.</h3>
+                    <p class="sc">Get started by scheduling your first meeting!</p>
+                    <br>
+                    <a href="{% url 'reunion:create' %}"
+                       class="btn-donate" style="display: inline-block; background-image: linear-gradient(325deg, hsl(217, 100%, 56%) 0%, hsl(194, 100%, 69%) 55%, hsl(217, 100%, 56%) 90%); color: white; padding: 0.9em 1.4em; border-radius: 0.5em; text-decoration: none; font-weight: 500;">
+                      Schedule Your First Meeting
+                    </a>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="jn/2 so">
+            <!-- Search Widget -->
+            <div class="animate_top fb">
+              <form method="get" action="{% url 'reunion:list' %}">
+                <div class="input-container">
+                  <input type="text" name="search" class="input" placeholder="Search Here..."
+                         value="{{ search_query }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" class="icon">
+                    <g stroke-width="0" id="SVGRepo_bgCarrier"></g>
+                    <g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <rect fill="white" height="24" width="24"></rect>
+                      <path fill="" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM9 11.5C9 10.1193 10.1193 9 11.5 9C12.8807 9 14 10.1193 14 11.5C14 12.8807 12.8807 14 11.5 14C10.1193 14 9 12.8807 9 11.5ZM11.5 7C9.01472 7 7 9.01472 7 11.5C7 13.9853 9.01472 16 11.5 16C12.3805 16 13.202 15.7471 13.8957 15.31L15.2929 16.7071C15.6834 17.0976 16.3166 17.0976 16.7071 16.7071C17.0976 16.3166 17.0976 15.6834 16.7071 15.2929L15.31 13.8957C15.7471 13.202 16 12.3805 16 11.5C16 9.01472 13.9853 7 11.5 7Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                    </g>
+                  </svg>
+                </div>
+              </form>
+            </div>
+
+            <!-- Meeting Types Widget -->
+            <div class="animate_top fb">
+              <h4 class="tj kk wm qb">Meeting Types</h4>
+              <ul>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=education">Education Course</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=project">Project Meeting</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=revision">Revision Session</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}?reunion_type=other">Other Meetings</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:list' %}">Show All Types</a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Upcoming Meetings -->
+            <div class="animate_top">
+              <h4 class="tj kk wm qb">Upcoming Meetings</h4>
+              <div>
+                {% for reunion in upcoming_reunions %}
+                  <div class="tc fg 2xl:ud-gap-6 qb">
+                    <div class="tc wf yf">
+                      <h5 class="wj kk wm xl bn ml il">{{ reunion.title }}</h5>
+                      <p class="sc">{{ reunion.date }} at {{ reunion.start_time }}</p>
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="tc fg 2xl:ud-gap-6">
+                    <div class="tc wf yf">
+                      <h5 class="wj kk wm xl bn ml il">No upcoming meetings</h5>
+                      <p class="sc">Schedule your first meeting to get started</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="animate_top rounded-md shadow-solid-13 bg-white dark:bg-blacksection border border-stroke dark:border-strokedark p-5">
+              <h4 class="tj kk wm qb">Quick Actions</h4>
+              <ul>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:create' %}">Schedule Meeting</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="{% url 'reunion:reminder_list' %}">View Reminders</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="#!">Meeting Templates</a>
+                </li>
+                <li class="ql vb du-ease-in-out il xl">
+                  <a href="#!">Export Schedule</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /Sidebar -->
+        </div>
+      </div>
+    </section>
+    <!-- ===== Meetings End ===== -->
+
+   
+  <!-- ====== Back To Top End ===== -->
+
+  <script defer src="{% static 'base_tailwind/bundle.js' %}"></script>
+</body>
+</html>

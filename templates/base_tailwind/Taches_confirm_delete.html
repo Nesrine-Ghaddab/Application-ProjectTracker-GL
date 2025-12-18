@@ -1,0 +1,143 @@
+{% extends 'base_tailwind/base_taches.html' %}
+{% load static %}
+
+{% block title %}Supprimer la tâche - {{ tache.titre }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="gj do ir hj sp jr i pg">
+  <div class="bb ze ki xn 2xl:ud-px-0">
+    <div class="tc _o">
+      <div class="animate_left jn/2">
+        <h1 class="fk vj zp or kk wm wb text-red-600">🗑️ Supprimer la tâche</h1>
+        <p class="fq">
+          Confirmez la suppression définitive de cette tâche.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section de confirmation -->
+<section class="ji gp uq pg">
+  <div class="bb ze ki xn wq">
+    <div class="max-w-3xl mx-auto animate_top">
+      <div class="i pg sg vk xm bi qj border-l-4 border-red-500">
+        <div class="p-8">
+          <!-- Avertissement -->
+          <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <span class="text-2xl text-red-500">⚠️</span>
+              </div>
+              <div class="ml-3">
+                <h3 class="ek yj kk wm text-red-800">Action irréversible</h3>
+                <p class="sc ak text-red-700 mt-1">
+                  Vous êtes sur le point de supprimer définitivement cette tâche. Cette action ne peut pas être annulée.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Détails de la tâche -->
+          <div class="mb-8">
+            <h3 class="ek yj kk wm nb _b mb-4">Détails de la tâche à supprimer</h3>
+            
+            <div class="space-y-4">
+              <!-- Titre -->
+              <div class="flex items-start">
+                <span class="ek yj kk wm nb _b w-24 flex-shrink-0">📌 Titre :</span>
+                <span class="sc ak flex-1">{{ tache.titre }}</span>
+              </div>
+
+              <!-- Description -->
+              <div class="flex items-start">
+                <span class="ek yj kk wm nb _b w-24 flex-shrink-0">📋 Description :</span>
+                <span class="sc ak flex-1">{{ tache.description|linebreaksbr }}</span>
+              </div>
+
+              <!-- Date d'échéance -->
+              <div class="flex items-start">
+                <span class="ek yj kk wm nb _b w-24 flex-shrink-0">⏰ Échéance :</span>
+                <span class="sc ak flex-1">{{ tache.dateEcheance }}</span>
+              </div>
+
+              <!-- Statut -->
+              <div class="flex items-start">
+                <span class="ek yj kk wm nb _b w-24 flex-shrink-0">📊 Statut :</span>
+                <span class="sc ak flex-1">
+                  {% if tache.statut == "TERMINE" %}
+                    {% if tache.resultat == "SUCCES" %}
+                      <span class="ek rg bg-green-500 text-white px-2 py-1 rounded-full text-xs">
+                        ✅ Terminée avec succès
+                      </span>
+                    {% else %}
+                      <span class="ek rg bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                        ❌ Terminée (échec)
+                      </span>
+                    {% endif %}
+                  {% elif tache.statut == "EN_COURS" %}
+                    <span class="ek rg bg-yellow-500 text-white px-2 py-1 rounded-full text-xs">
+                      ⏳ En cours
+                    </span>
+                  {% else %}
+                    <span class="ek rg bg-gray-500 text-white px-2 py-1 rounded-full text-xs">
+                      📝 À faire
+                    </span>
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulaire de confirmation -->
+          <form method="post">
+            {% csrf_token %}
+            
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
+              <button type="submit" class="ek rg bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md border border-red-700 hover:border-red-800 transition-all duration-300 w-full sm:w-auto">
+                <span class="flex items-center justify-center">
+                  🗑️ Confirmer la suppression
+                </span>
+              </button>
+              
+              <a href="{% url 'Taches:frontoffice' %}" class="ek rg bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md border border-gray-600 hover:border-gray-700 transition-all duration-300 w-full sm:w-auto text-center">
+                <span class="flex items-center justify-center">
+                  ↩️ Annuler
+                </span>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section d'information -->
+<section class="ji gp uq">
+  <div class="bb ze ki xn wq">
+    <div class="max-w-3xl mx-auto animate_top">
+      <div class="i pg sg vk xm bi qj border-l-4 border-orange-500">
+        <div class="p-6">
+          <h4 class="ek yj kk wm nb _b mb-3">ℹ️ Information</h4>
+          <ul class="space-y-2 sc ak">
+            <li class="flex items-start">
+              <span class="text-orange-500 mr-2">•</span>
+              <span>La suppression est définitive et ne peut pas être annulée</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-orange-500 mr-2">•</span>
+              <span>Toutes les données associées à cette tâche seront perdues</span>
+            </li>
+            <li class="flex items-start">
+              <span class="text-orange-500 mr-2">•</span>
+              <span>Cette action supprimera définitivement l'enregistrement de la base de données</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
