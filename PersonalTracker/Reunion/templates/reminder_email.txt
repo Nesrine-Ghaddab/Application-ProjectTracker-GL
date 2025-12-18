@@ -1,0 +1,18 @@
+Hello,
+
+A new reunion has been scheduled:
+
+Title: {{ reunion.title }}
+Date: {{ reunion.date }}
+Start Time: {{ reunion.start_time }}
+End Time: {{ reunion.end_time }}
+Type: {{ reunion.get_reunion_type_display }}
+Subject: {{ reunion.get_subject_display }}
+
+{% if reunion.description %}
+Description:
+{{ reunion.description }}
+{% endif %}
+
+Best regards,
+{{ site_name }}
